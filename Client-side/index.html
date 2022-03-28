@@ -1,7 +1,8 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    
+    <!-- Plot library -->
+    <script src='https://cdn.plot.ly/plotly-2.9.0.min.js'></script>
 
     <!-- TODO: move in separate file -->
     <script>
@@ -57,14 +58,14 @@
         },
         page: 1, // Current page
         pagesCount: 1, // Pages count
-        checkedRows: [], // list contain selected rows by json indexes
+        checkedRows: [], // list contain selected rows by json indexes TODO: save between page refresh
         // Update page counter
         pageCouter: function() {
             // Calc pages count
             this.pagesCount = parseInt(this.json.values.count / TABLE_ROWS)
             if (this.json.values.count % TABLE_ROWS > 0)
                 this.pagesCount++
-            //alert(this.page)
+                
             this.pagesCount = 8
             var pages_counter = document.getElementById('pages_counter')
             pages_counter.innerHTML = ""
@@ -113,6 +114,127 @@
             this.json.parse(json_data) // Parse and store json values
             this.selectPage(1) // Fill first table page  
         },
+        buildPlot: function() {
+            // Filter selected rows in json data
+            var json_filtered = table.json.values.data.filter(element => table.checkedRows.includes(element.id))
+
+            var SMR_min = {
+                x: [],
+                y: [],
+                name: 'SMR min',
+                type: 'bar',
+                marker: {
+                    color: 'rgb(0,124,0)'
+                }
+            };
+            var SMR_avg = {
+                x: [],
+                y: [],
+                text: [],
+                name: 'SMR avg',
+                type: 'bar',
+                marker: {
+                    color: 'rgb(142,124,195)'
+                }
+            };
+            var SMR_max = {
+                x: [],
+                y: [],
+                name: 'SMR max',
+                type: 'bar',
+                marker: {
+                    color: 'rgb(142,0,0)'
+                }
+            };
+
+            var MMR_min = {
+                x: [],
+                y: [],
+                name: 'MMR min',
+                type: 'bar',
+                marker: {
+                    color: 'rgb(0,124,0)'
+                }
+            };
+            var MMR_avg = {
+                x: [],
+                y: [],
+                text: [],
+                name: 'MMR avg',
+                type: 'bar',
+                marker: {
+                    color: 'rgb(142,124,195)'
+                }
+            };
+            var MMR_max = {
+                x: [],
+                y: [],
+                name: 'MMR max',
+                type: 'bar',
+                marker: {
+                    color: 'rgb(142,0,0)'
+                }
+            };
+            
+            for (i = 0; i < json_filtered.length; i++) {
+                if (json_filtered[i].Species == undefined) {
+                    SMR_avg.x.push('')
+                    SMR_min.x.push('')
+                    SMR_max.x.push('')
+                    MMR_avg.x.push('')
+                    MMR_min.x.push('')
+                    MMR_max.x.push('')
+                }
+                else {
+                    SMR_avg.x.push(json_filtered[i].Species)
+                    SMR_min.x.push(json_filtered[i].Species)
+                    SMR_max.x.push(json_filtered[i].Species)
+                    MMR_avg.x.push(json_filtered[i].Species)
+                    MMR_min.x.push(json_filtered[i].Species)
+                    MMR_max.x.push(json_filtered[i].Species)
+                }
+                if (json_filtered[i].SMR_avg == undefined) {
+                    SMR_avg.y.push(0)
+                    MMR_avg.y.push(0)
+                }
+                else {
+                    SMR_avg.y.push(json_filtered[i].SMR_avg)
+                    MMR_avg.y.push(json_filtered[i].MMR_avg)
+                }
+                if (json_filtered[i].SMR_min == undefined) {
+                    SMR_min.y.push(0)
+                    MMR_min.y.push(0)
+                }
+                else {
+                    SMR_min.y.push(json_filtered[i].SMR_min)
+                    MMR_min.y.push(json_filtered[i].MMR_min)
+                }
+                if (json_filtered[i].SMR_max == undefined) {
+                    SMR_max.y.push(0)
+                    MMR_max.y.push(0)
+                }
+                else {
+                    SMR_max.y.push(json_filtered[i].SMR_max)
+                    MMR_max.y.push(json_filtered[i].MMR_max)
+                }
+
+                if (json_filtered[i].Publication == undefined) {
+                    SMR_avg.text.push('')
+                    MMR_avg.text.push('')
+                }
+                else {
+                    SMR_avg.text.push(json_filtered[i].Publication)
+                    MMR_avg.text.push(json_filtered[i].Publication)
+                }
+
+            }
+
+            var SMR_data = [SMR_min, SMR_avg, SMR_max];
+            var MMR_data = [MMR_min, MMR_avg, MMR_max];
+            var layout = {barmode: 'stack'};
+            Plotly.newPlot('SMR', SMR_data, layout);
+            Plotly.newPlot('MMR', MMR_data, layout);
+        },
         // Fill table cell with indexes
         fill_table_cell: function(column, row, curent_index) {
             var object = null
@@ -140,6 +262,7 @@
                             // Add row to selected rows list
                             table.checkedRows.push(object.value)
                         }
+                        table.buildPlot()
                     }
                     
                     // Checking if selecting this row is needed
@@ -147,6 +270,7 @@
                         object.checked = true
                         html_table.children[object.name].className = 'SelectedRow'
                         table.checkedRows.push(object.value)
+                        table.buildPlot()
                     }
                     break
                 case T_SPECIES:
@@ -348,65 +472,84 @@
             border: 0px solid;
             max-width: 2.4rem;
         }
-      
+        
+        /* Divs container */
+        div.container {
+            height: 95vh;
+            display: flex;
+        }
+        div.leftTable {
+            width: 70%;
+            overflow: auto;
+        }
+        div.rightPlots {
+            width: 30%;
+            overflow: auto;
+        }
     </style>
 </head>
 <body onload="init()">
-    <!-- Debug buttons -->
-    <button onclick="uploadTestData()">Upload test data</button>
-    <button onclick="switchLock()">Enable hover</button>
-    <button onclick="table.selectPage(1)">Set page 1</button>
-    <button onclick="table.selectPage(2)">Set page 2</button>
+    <div class="container">
+        <div class="leftTable">
+            <!-- Table for respirometry -->
+            <table>
+                <!-- Header with filters -->
+                <tbody>
+                    <tr>
+                        <td>Select</td>
+                        <td>Species</td>
+                        <td>Publication</td>
+                        <td>Temperature</td>
+                        <td>Salinity</td>
+                        <td>DO level</td>
+                        <td>SMR avg</td>
+                        <td>SMR min</td>
+                        <td>SMR max</td>
+                        <td>MMR avg</td>
+                        <td>MMR min</td>
+                        <td>MMR max</td>
+                        <td>MMR method</td>
+                        <td>Mass avg</td>
+                        <td>BR test</td>
+                        <td>Comment</td>
+                    </tr>
+                    <tr>
+                        <td class="disabled">Filters:</td>
+                        <td><input class="Unbordered" id="filter_Species" placeholder="Name"></td>
+                        <td><input class="Unbordered" id="filter_Publication" placeholder="DOI"></td>
+                        <td><input class="Unbordered" id="filter_Temperature" placeholder="min">-<input class="Unbordered" id="filter_Temperature" placeholder="max"></td>
+                        <td><input class="Unbordered" id="filter_Salinity" placeholder="min">-<input class="Unbordered" id="filter_Salinity" placeholder="max"></td>
+                        <td><input class="Unbordered" id="filter_DO level" placeholder="min">-<input class="Unbordered" id="filter_DO level" placeholder="max"></td>
+                        <td><input class="Unbordered" id="filter_SMR avg" placeholder="min">-<input class="Unbordered" id="filter_SMR avg" placeholder="max"></td>
+                        <td><input class="Unbordered" id="filter_SMR min" placeholder="min">-<input class="Unbordered" id="filter_SMR min" placeholder="max"></td>
+                        <td><input class="Unbordered" id="filter_SMR max" placeholder="min">-<input class="Unbordered" id="filter_SMR max" placeholder="max"></td>
+                        <td><input class="Unbordered" id="filter_MMR avg" placeholder="min">-<input class="Unbordered" id="filter_MMR avg" placeholder="max"></td>
+                        <td><input class="Unbordered" id="filter_MMR min" placeholder="min">-<input class="Unbordered" id="filter_MMR min" placeholder="max"></td>
+                        <td><input class="Unbordered" id="filter_MMR max" placeholder="min">-<input class="Unbordered" id="filter_MMR max" placeholder="max"></td>
+                        <td><input class="Unbordered" id="filter_MMR method" placeholder="min">-<input class="Unbordered" id="filter_MMR method" placeholder="max"></td>
+                        <td><input class="Unbordered" id="filter_Mass avg" placeholder="min">-<input class="Unbordered" id="filter_Mass avg" placeholder="max"></td>
+                        <td><input class="Unbordered" id="filter_BR test" placeholder="min">-<input class="Unbordered" id="filter_BR test" placeholder="max"></td>
+                        <td class="disabled"></td>
+                    </tr>
+                </tbody>
 
-    <!-- Table for respirometry -->
-    <table>
-        <!-- Header with filters -->
-        <tbody>
-            <tr>
-                <td>Select</td>
-                <td>Species</td>
-                <td>Publication</td>
-                <td>Temperature</td>
-                <td>Salinity</td>
-                <td>DO level</td>
-                <td>SMR avg</td>
-                <td>SMR min</td>
-                <td>SMR max</td>
-                <td>MMR avg</td>
-                <td>MMR min</td>
-                <td>MMR max</td>
-                <td>MMR method</td>
-                <td>Mass avg</td>
-                <td>BR test</td>
-                <td>Comment</td>
-            </tr>
-            <tr>
-                <td class="disabled">Filters:</td>
-                <td><input class="Unbordered" id="filter_Species" placeholder="Name"></td>
-                <td><input class="Unbordered" id="filter_Publication" placeholder="DOI"></td>
-                <td><input class="Unbordered" id="filter_Temperature" placeholder="min">-<input class="Unbordered" id="filter_Temperature" placeholder="max"></td>
-                <td><input class="Unbordered" id="filter_Salinity" placeholder="min">-<input class="Unbordered" id="filter_Salinity" placeholder="max"></td>
-                <td><input class="Unbordered" id="filter_DO level" placeholder="min">-<input class="Unbordered" id="filter_DO level" placeholder="max"></td>
-                <td><input class="Unbordered" id="filter_SMR avg" placeholder="min">-<input class="Unbordered" id="filter_SMR avg" placeholder="max"></td>
-                <td><input class="Unbordered" id="filter_SMR min" placeholder="min">-<input class="Unbordered" id="filter_SMR min" placeholder="max"></td>
-                <td><input class="Unbordered" id="filter_SMR max" placeholder="min">-<input class="Unbordered" id="filter_SMR max" placeholder="max"></td>
-                <td><input class="Unbordered" id="filter_MMR avg" placeholder="min">-<input class="Unbordered" id="filter_MMR avg" placeholder="max"></td>
-                <td><input class="Unbordered" id="filter_MMR min" placeholder="min">-<input class="Unbordered" id="filter_MMR min" placeholder="max"></td>
-                <td><input class="Unbordered" id="filter_MMR max" placeholder="min">-<input class="Unbordered" id="filter_MMR max" placeholder="max"></td>
-                <td><input class="Unbordered" id="filter_MMR method" placeholder="min">-<input class="Unbordered" id="filter_MMR method" placeholder="max"></td>
-                <td><input class="Unbordered" id="filter_Mass avg" placeholder="min">-<input class="Unbordered" id="filter_Mass avg" placeholder="max"></td>
-                <td><input class="Unbordered" id="filter_BR test" placeholder="min">-<input class="Unbordered" id="filter_BR test" placeholder="max"></td>
-                <td class="disabled"></td>
-            </tr>
-        </tbody>
-
-        <!-- Dynamicaly filled rows -->
-        <tbody id="table"></tbody>
-    </table>
+                <!-- Dynamicaly filled rows -->
+                <tbody id="table"></tbody>
+            </table>
+        </div>
+        <div class="rightPlots">
+            <!-- Charts section -->
+            <div id='SMR'></div>
+            <div id='MMR'></div>
+        </div>
+    </div>
     <!-- Dynamicaly filled pages counter -->
     <div id="pages_counter"></div>
         
 
+    <!-- Debug buttons -->
+    <button onclick="uploadTestData()">Upload test data</button>
+    <button onclick="switchLock()">Enable hover</button>
     <!-- Hover for loading data -->
     <div id="hover" class="hover"></div>
 </body>
