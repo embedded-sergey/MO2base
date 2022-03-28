@@ -32,17 +32,56 @@
     var table = {
         // Variable for data from server
         json: {
-            values: {count: 0}, // Parsed values
+            values: {count: 0, data: []}, // Parsed values
+            deleteUnselected: function() {
+                // Remove unselected values
+                this.values.data = this.values.data.filter(element => table.checkedRows.includes(element.id))
+                this.values.count = this.values.data.lenght
+            },
             parse: function (json_data) {
                 if(json_data) {
-                    this.values = JSON.parse(json_data);
+                    // Remove unchecked rows in table
+                    this.deleteUnselected()
+                    // Parse new data
+                    var values = JSON.parse(json_data);
+                    // Remove duplicates with old checked data
+                    values.data = values.data.filter(element => !table.checkedRows.includes(element.id))
+                    // Append new to old values
+                    this.values.data = this.values.data.concat(values.data)
+                    // Calc new lenght
+                    this.values.count = this.values.data.length
+                    // Save data
                     sessionStorage.setItem("fishresp_autosave", json_data)
                 }
-                else
-                    this.values.count = 0 // TODO: add checking for available json values
             }
         },
         page: 1, // Current page
+        pagesCount: 1, // Pages count
+        checkedRows: [], // list contain selected rows by json indexes
+        // Update page counter
+        pageCouter: function() {
+            // Calc pages count
+            this.pagesCount = parseInt(this.json.values.count / TABLE_ROWS)
+            if (this.json.values.count % TABLE_ROWS > 0)
+                this.pagesCount++
+            //alert(this.page)
+            this.pagesCount = 8
+            var pages_counter = document.getElementById('pages_counter')
+            pages_counter.innerHTML = ""
+            if (this.page > 1)
+                pages_counter.innerHTML = "<a onclick='table.selectPage(1)'>1</a>"
+            if (this.page > 3)
+                pages_counter.innerHTML += "..."
+            if ((this.page-1) > 1)
+                pages_counter.innerHTML += "<a onclick='table.selectPage("+(this.page-1)+")'>"+(this.page-1)+"</a>"
+            pages_counter.innerHTML += "<a style='font-weight:bold;' onclick='table.selectPage("+this.page+")'>"+this.page+"</a>"
+            if ((this.page+1) < this.pagesCount)
+                pages_counter.innerHTML += "<a onclick='table.selectPage("+(this.page+1)+")'>"+(this.page+1)+"</a>"
+            if (this.page+1 < this.pagesCount)
+                pages_counter.innerHTML += "..."
+            if (this.page != this.pagesCount)
+                pages_counter.innerHTML += "<a onclick='table.selectPage("+this.pagesCount+")'>"+this.pagesCount+"</a>"
+        },
         // Select page
         selectPage: function(page) {
             this.page = page // Remember the memory page
@@ -51,10 +90,7 @@
             var html_table = document.getElementById("table")
             // Cleanup old data
             while(html_table.hasChildNodes())
-            {
-                // TODO: Make check for unselected rows
                 html_table.removeChild(html_table.firstChild);
-            }
             
             // Calc current index for selected page
             var curent_index = (this.page-1) * TABLE_ROWS
@@ -69,17 +105,18 @@
                         current_column.appendChild(this.fill_table_cell(column, row, curent_index))
                 }
                 curent_index++
-            }
-            // TODO: pages counter
+            }       
+            this.pageCouter() // Update page counter
         },
         // Update table data, when new json received
         update: function(json_data) {
             this.json.parse(json_data) // Parse and store json values
-            this.selectPage(1) // Fill first table page
+            this.selectPage(1) // Fill first table page  
         },
         // Fill table cell with indexes
         fill_table_cell: function(column, row, curent_index) {
             var object = null
+            var html_table = document.getElementById("table")
             // Create object for column
             switch (column) {
                 case T_CHECKBOX:
@@ -89,12 +126,27 @@
                     object.value = this.json.values.data[curent_index].id;
                     object.id = "id" + column + "_" + row;
                     // object.name = "name" + json.items[i].name;
+                    // On change function
                     object.onchange = function() {
-                        var html_table = document.getElementById("table")
-                        if (html_table.children[object.name].className == 'SelectedRow')
+                        if (html_table.children[object.name].className == 'SelectedRow') {
+                            // Remove selection color
                             html_table.children[object.name].className = 'UnselectedRow'
-                        else
+                            // Remove row from selected rows list
+                            table.checkedRows = table.checkedRows.filter(element => element != object.value)
+                        }
+                        else {
+                            // Set selection color
                             html_table.children[object.name].className = 'SelectedRow'
+                            // Add row to selected rows list
+                            table.checkedRows.push(object.value)
+                        }
+                    }
+                    
+                    // Checking if selecting this row is needed
+                    if (table.checkedRows.includes(object.value)) {
+                        object.checked = true
+                        html_table.children[object.name].className = 'SelectedRow'
+                        table.checkedRows.push(object.value)
                     }
                     break
                 case T_SPECIES:
@@ -254,6 +306,7 @@
 '
         sessionStorage.setItem("fishresp_autosave", json_text)
         table.update(json_text)
+
     }
     </script>
 
@@ -302,6 +355,8 @@
     <!-- Debug buttons -->
     <button onclick="uploadTestData()">Upload test data</button>
     <button onclick="switchLock()">Enable hover</button>
+    <button onclick="table.selectPage(1)">Set page 1</button>
+    <button onclick="table.selectPage(2)">Set page 2</button>
 
     <!-- Table for respirometry -->
     <table>
@@ -348,8 +403,9 @@
         <!-- Dynamicaly filled rows -->
         <tbody id="table"></tbody>
     </table>
+    <!-- Dynamicaly filled pages counter -->
+    <div id="pages_counter"></div>
         
-
 
     <!-- Hover for loading data -->
     <div id="hover" class="hover"></div>
