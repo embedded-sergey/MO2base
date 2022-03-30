@@ -335,7 +335,7 @@ require_once 'database.php';
             };
             // TODO: this one wrong at smr/mmr at one if
             for (let i = 0; i < json_filtered.length; i++) {
-                if (json_filtered[i].Species == undefined) {
+                if (json_filtered[i].species == undefined) {
                     SMR_avg.x.push('')
                     SMR_min.x.push('')
                     SMR_max.x.push('')
@@ -351,28 +351,41 @@ require_once 'database.php';
                     MMR_min.x.push(json_filtered[i].species)
                     MMR_max.x.push(json_filtered[i].species)
                 }
+
                 if (json_filtered[i].smr_avg == undefined) {
                     SMR_avg.y.push(0)
-                    MMR_avg.y.push(0)
                 }
                 else {
                     SMR_avg.y.push(json_filtered[i].smr_avg)
-                    MMR_avg.y.push(json_filtered[i].mmr_avg)
                 }
                 if (json_filtered[i].smr_min == undefined) {
                     SMR_min.y.push(0)
-                    MMR_min.y.push(0)
                 }
                 else {
                     SMR_min.y.push(json_filtered[i].smr_min)
-                    MMR_min.y.push(json_filtered[i].mmr_min)
                 }
                 if (json_filtered[i].smr_max == undefined) {
                     SMR_max.y.push(0)
-                    MMR_max.y.push(0)
                 }
                 else {
                     SMR_max.y.push(json_filtered[i].smr_max)
+                }
+                if (json_filtered[i].mmr_avg == undefined) {
+                    MMR_avg.y.push(0)
+                }
+                else {
+                    MMR_avg.y.push(json_filtered[i].mmr_avg)
+                }
+                if (json_filtered[i].mmr_min == undefined) {
+                    MMR_min.y.push(0)
+                }
+                else {
+                    MMR_min.y.push(json_filtered[i].mmr_min)
+                }
+                if (json_filtered[i].mmr_max == undefined) {
+                    MMR_max.y.push(0)
+                }
+                else {
                     MMR_max.y.push(json_filtered[i].mmr_max)
                 }
 
