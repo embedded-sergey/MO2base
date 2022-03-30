@@ -421,7 +421,7 @@ require_once 'database.php';
             var xhr = new XMLHttpRequest()
             xhr.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
-                    console.log(this.responseText)
+                    // console.log(this.responseText)
                     table.update(this.responseText)
                     // Disable lock
                     switchLock()       
@@ -451,7 +451,7 @@ require_once 'database.php';
         else
         {
             table.loadData() // Request server for new data
-            table.update() // Gen table for new data
+            table.update() // Gen empty table if nothing loaded
             table.buildPlots() // Build plots
         }
     }

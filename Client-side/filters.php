@@ -57,17 +57,23 @@ while ($row = $stmt->fetch())
     {
         $col = $stmt->getColumnMeta($i);
         echo "      \"" . $col['name'] . "\":";
-        if ($col['native_type'] == "STRING"
-        ||  $col['native_type'] == "VAR_STRING"
-        ||  $col['native_type'] == "BLOB")
+        if ( isset($row[$i])
+        &&  (   $col['native_type'] == "STRING"
+             || $col['native_type'] == "VAR_STRING"
+             || $col['native_type'] == "BLOB"
+            )
+        )
             echo "\"";
         if (isset($row[$i]))
             echo $row[$i];
         else
             echo "null";
-        if ($col['native_type'] == "STRING"
-        ||  $col['native_type'] == "VAR_STRING"
-        ||  $col['native_type'] == "BLOB")
+        if ( isset($row[$i])
+        &&  (   $col['native_type'] == "STRING"
+                || $col['native_type'] == "VAR_STRING"
+                || $col['native_type'] == "BLOB"
+            )
+        )
             echo "\"";
         if ($i < $stmt->columnCount()-1)
             echo ",";
