@@ -409,6 +409,27 @@
 
             this.loadData()
         }
+
+        // Request data from server
+        loadData() {
+            // Enable lock
+            switchLock()
+
+            // // Sync request
+            // var xhr = new XMLHttpRequest();
+            // xhr.addEventListener("readystatechange", function () {
+            //     if (this.readyState === 4) {
+            //         table.update(this.responseText);
+            //     }
+            // });
+            // xhr.open("POST", "http://localhost:4747/");
+            // xhr.timeout = 2000; // time in milliseconds
+            // xhr.setRequestHeader("content-type", "application/json");
+            // xhr.send(JSON.stringify(this.#filters));
+
+            // Disable lock
+            switchLock()         
+        }
     } 
 
     let table = new Table
