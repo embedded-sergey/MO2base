@@ -45,8 +45,10 @@
                 this.#json.data = this.#json.data.filter(element => table.#checkedRows.includes(element.id))
                 // Parse new data
                 var new_json = JSON.parse(data);
-                // Remove duplicates with old checked data
-                new_json.data = new_json.data.filter(element => !this.#checkedRows.includes(element.id))
+                // if old json data contains elements
+                if (this.#json.data.length)
+                    // Remove duplicates with old checked data
+                    new_json.data = new_json.data.filter(element => !this.#checkedRows.includes(element.id))
                 // Append new to old values
                 this.#json.data = this.#json.data.concat(new_json.data)
                 // Calc new lenght
@@ -73,16 +75,18 @@
                 // Remove selection color
                 html_table.children[checkbox.name].className = 'UnselectedRow'
                 // Remove row from selected rows list
-                this.#checkedRows = this.#checkedRows.filter(element => element != checkbox.value)
+                this.#checkedRows = this.#checkedRows.filter(element => element != parseInt(checkbox.value))
             }
             else {
                 // Set selection color
                 html_table.children[checkbox.name].className = 'SelectedRow'
                 // Add row to selected rows list
-                this.#checkedRows.push(checkbox.value)
+                this.#checkedRows.push(parseInt(checkbox.value))
             }
             // Save selected rows
             sessionStorage.setItem("fishresp_checkedRows", this.#checkedRows)
+            // Update plots
+            this.buildPlots()
         }
 
         // Update page counter
@@ -266,7 +270,7 @@
         // Build plot on selected rows
         buildPlots() {
             // Filter selected rows in json data
-            var json_filtered = this.#json.data.filter(element => this.#checkedRows.includes(parseInt(element.id)))
+            var json_filtered = this.#json.data.filter(element => this.#checkedRows.includes(element.id))
 
             var SMR_min = {
                 x: [],
@@ -422,7 +426,7 @@
     "count":2,\
     "data":[\
         {\
-            "id":"1",\
+            "id":1,\
             "Species":"fish_1",\
             "Publication":"213/321",\
             "Temperature":24,\
@@ -431,7 +435,7 @@
             "SMR_avg":120\
         },\
         {\
-            "id":"2",\
+            "id":2,\
             "Species":"fish_2",\
             "Publication":"213/321",\
             "Temperature":12,\
