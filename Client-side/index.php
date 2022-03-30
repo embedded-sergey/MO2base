@@ -177,91 +177,91 @@ require_once 'database.php';
                     }
                     break
                 case T_SPECIES:
-                    var value = this.#json.data[curent_index].Species
+                    var value = this.#json.data[curent_index].species
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_PUBLICATION:
-                    var value = this.#json.data[curent_index].Publication
+                    var value = this.#json.data[curent_index].publication
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_TEMPERATURE:
-                    var value = this.#json.data[curent_index].Temperature
+                    var value = this.#json.data[curent_index].temperature
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_SALINITY:
-                    var value = this.#json.data[curent_index].Salinity
+                    var value = this.#json.data[curent_index].salinity
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_DO_LEVEL:
-                    var value = this.#json.data[curent_index].DO_level
+                    var value = this.#json.data[curent_index].do_level
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_SMR_AVG:
-                    var value = this.#json.data[curent_index].SMR_avg
+                    var value = this.#json.data[curent_index].smr_avg
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_SMR_MIN:
-                    var value = this.#json.data[curent_index].SMR_min
+                    var value = this.#json.data[curent_index].smr_min
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_SMR_MAX:
-                    var value = this.#json.data[curent_index].SMR_max
+                    var value = this.#json.data[curent_index].smr_max
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_MMR_AVG:
-                    var value = this.#json.data[curent_index].MMR_avg
+                    var value = this.#json.data[curent_index].mmr_avg
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_MMR_MIN:
-                    var value = this.#json.data[curent_index].MMR_min
+                    var value = this.#json.data[curent_index].mmr_min
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_MMR_MAX:
-                    var value = this.#json.data[curent_index].MMR_max
+                    var value = this.#json.data[curent_index].mmr_max
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_MMR_METHOD:
-                    var value = this.#json.data[curent_index].MMR_method
+                    var value = this.#json.data[curent_index].mmr_method
                     if (value == undefined)
                         value = 'no'
                     object = document.createTextNode(value)
                     break
                 case T_MASS_AVG:
-                    var value = this.#json.data[curent_index].Mass_avg
+                    var value = this.#json.data[curent_index].mass_avg
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_BR_TEST:
-                    var value = this.#json.data[curent_index].BR_test
+                    var value = this.#json.data[curent_index].br_test
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_COMMENT:
-                    var value = this.#json.data[curent_index].Comment
+                    var value = this.#json.data[curent_index].comment
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
@@ -334,7 +334,7 @@ require_once 'database.php';
                     color: 'rgb(142,0,0)'
                 }
             };
-            
+            // TODO: this one wrong at smr/mmr at one if
             for (let i = 0; i < json_filtered.length; i++) {
                 if (json_filtered[i].Species == undefined) {
                     SMR_avg.x.push('')
@@ -345,45 +345,45 @@ require_once 'database.php';
                     MMR_max.x.push('')
                 }
                 else {
-                    SMR_avg.x.push(json_filtered[i].Species)
-                    SMR_min.x.push(json_filtered[i].Species)
-                    SMR_max.x.push(json_filtered[i].Species)
-                    MMR_avg.x.push(json_filtered[i].Species)
-                    MMR_min.x.push(json_filtered[i].Species)
-                    MMR_max.x.push(json_filtered[i].Species)
+                    SMR_avg.x.push(json_filtered[i].species)
+                    SMR_min.x.push(json_filtered[i].species)
+                    SMR_max.x.push(json_filtered[i].species)
+                    MMR_avg.x.push(json_filtered[i].species)
+                    MMR_min.x.push(json_filtered[i].species)
+                    MMR_max.x.push(json_filtered[i].species)
                 }
-                if (json_filtered[i].SMR_avg == undefined) {
+                if (json_filtered[i].smr_avg == undefined) {
                     SMR_avg.y.push(0)
                     MMR_avg.y.push(0)
                 }
                 else {
-                    SMR_avg.y.push(json_filtered[i].SMR_avg)
-                    MMR_avg.y.push(json_filtered[i].MMR_avg)
+                    SMR_avg.y.push(json_filtered[i].smr_avg)
+                    MMR_avg.y.push(json_filtered[i].mmr_avg)
                 }
-                if (json_filtered[i].SMR_min == undefined) {
+                if (json_filtered[i].smr_min == undefined) {
                     SMR_min.y.push(0)
                     MMR_min.y.push(0)
                 }
                 else {
-                    SMR_min.y.push(json_filtered[i].SMR_min)
-                    MMR_min.y.push(json_filtered[i].MMR_min)
+                    SMR_min.y.push(json_filtered[i].smr_min)
+                    MMR_min.y.push(json_filtered[i].mmr_min)
                 }
-                if (json_filtered[i].SMR_max == undefined) {
+                if (json_filtered[i].smr_max == undefined) {
                     SMR_max.y.push(0)
                     MMR_max.y.push(0)
                 }
                 else {
-                    SMR_max.y.push(json_filtered[i].SMR_max)
-                    MMR_max.y.push(json_filtered[i].MMR_max)
+                    SMR_max.y.push(json_filtered[i].smr_max)
+                    MMR_max.y.push(json_filtered[i].mmr_max)
                 }
 
-                if (json_filtered[i].Publication == undefined) {
+                if (json_filtered[i].publication == undefined) {
                     SMR_avg.text.push('')
                     MMR_avg.text.push('')
                 }
                 else {
-                    SMR_avg.text.push(json_filtered[i].Publication)
-                    MMR_avg.text.push(json_filtered[i].Publication)
+                    SMR_avg.text.push(json_filtered[i].publication)
+                    MMR_avg.text.push(json_filtered[i].publication)
                 }
 
             }
@@ -422,6 +422,7 @@ require_once 'database.php';
             var xhr = new XMLHttpRequest()
             xhr.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
+                    console.log(this.responseText)
                     table.update(this.responseText)
                     // Disable lock
                     switchLock()       
@@ -432,7 +433,7 @@ require_once 'database.php';
                 console.log('Connection timeout')
             })
             // TODO: replace ip by server address
-            xhr.open("POST", "http://127.0.0.1:4747/")
+            xhr.open("POST", "http://127.0.0.1:81/filters.php")
             xhr.send(JSON.stringify(this.#filters))
         }
     } 
@@ -475,29 +476,29 @@ require_once 'database.php';
     "data":[\
         {\
             "id":1,\
-            "Species":"fish_1",\
-            "Publication":"213/321",\
-            "Temperature":24,\
-            "Salinity":"0",\
-            "DO_level":100,\
-            "SMR_avg":120\
+            "species":"fish_1",\
+            "publication":"213/321",\
+            "temperature":24,\
+            "salinity":"0",\
+            "do_level":100,\
+            "smr_avg":120\
         },\
         {\
             "id":2,\
-            "Species":"fish_2",\
-            "Publication":"213/321",\
-            "Temperature":12,\
-            "Salinity":"0",\
-            "DO_level":100,\
-            "SMR_avg":89,\
-            "SMR_min":65,\
-            "SMR_max":144,\
-            "MMR_avg":163,\
-            "MMR_min":159,\
-            "MMR_max":354,\
-            "MMR_method":"Ucrit",\
-            "Mass_avg":20,\
-            "BR_test":"yes",\
+            "species":"fish_2",\
+            "publication":"213/321",\
+            "temperature":12,\
+            "salinity":"0",\
+            "do_level":100,\
+            "smr_avg":89,\
+            "smr_min":65,\
+            "smr_max":144,\
+            "smr_avg":163,\
+            "smr_min":159,\
+            "smr_max":354,\
+            "smr_method":"Ucrit",\
+            "mass_avg":20,\
+            "br_test":"yes",\
             "Comment":"Fish 2 comment"\
         }\
     ]\
