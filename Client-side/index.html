@@ -415,20 +415,22 @@
             // Enable lock
             switchLock()
 
-            // // Sync request
-            // var xhr = new XMLHttpRequest();
-            // xhr.addEventListener("readystatechange", function () {
-            //     if (this.readyState === 4) {
-            //         table.update(this.responseText);
-            //     }
-            // });
-            // xhr.open("POST", "http://localhost:4747/");
-            // xhr.timeout = 2000; // time in milliseconds
-            // xhr.setRequestHeader("content-type", "application/json");
-            // xhr.send(JSON.stringify(this.#filters));
-
-            // Disable lock
-            switchLock()         
+            // Sync request
+            var xhr = new XMLHttpRequest()
+            xhr.addEventListener("readystatechange", function () {
+                if (this.readyState === 4) {
+                    table.update(this.responseText)
+                    // Disable lock
+                    switchLock()       
+                }
+            })
+            xhr.timeout = 4000; // Set timeout to 4 seconds (4000 milliseconds)
+            xhr.addEventListener("timeout", function () {
+                console.log('Connection timeout')
+            })
+            // TODO: replace ip by server address
+            xhr.open("POST", "http://127.0.0.1:4747/")
+            xhr.send(JSON.stringify(this.#filters))
         }
     } 
 
@@ -437,16 +439,18 @@
     // Function to initialize filters and autosave 
     function init() {
         fishresp_json = sessionStorage.getItem("fishresp_json")
+        // if has autosave
         if (fishresp_json) {
-            // Restore the contents of json data
-            table.restore_checkedRows()
-            table.update(fishresp_json)
-            // Update plots
-            table.buildPlots()
+            table.restore_checkedRows() // Restore the contents of checked rows 
+            table.update(fishresp_json) // Restore the contents of json data
+            table.buildPlots() // Build plots
         }
         else
-            // TODO: send request to server for last TABLE_ROWS lines
-            table.update() // Gen empty table
+        {
+            table.loadData() // Request server for new data
+            table.update() // Gen table for new data
+            table.buildPlots() // Build plots
+        }
     }
     
     // function to block the page while loading
