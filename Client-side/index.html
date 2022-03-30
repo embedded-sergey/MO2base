@@ -52,7 +52,16 @@
                 // Calc new lenght
                 this.#json.count = this.#json.data.length
                 // Save data
-                //sessionStorage.setItem("fishresp_json", this.#json.stringify())
+                sessionStorage.setItem("fishresp_json", JSON.stringify(this.#json))
+            }
+        }
+
+        // Method to restore saved checkedRows
+        restore_checkedRows() {
+            let fishresp_checkedRows = sessionStorage.getItem("fishresp_checkedRows")
+            if (fishresp_checkedRows) {
+                this.#checkedRows = JSON.parse('[' + fishresp_checkedRows + ']')
+                console.log(this.#checkedRows)
             }
         }
 
@@ -73,7 +82,7 @@
                 // Add row to selected rows list
                 this.#checkedRows.push(checkbox.value)
             }
-            this.buildPlot()
+            // Save selected rows
             sessionStorage.setItem("fishresp_checkedRows", this.#checkedRows)
         }
 
@@ -154,10 +163,9 @@
                     }
                     
                     // Checking if selecting this row is needed
-                    if (this.#checkedRows.includes(object.value)) {
+                    if (this.#checkedRows.includes(parseInt(object.value))) {
                         object.checked = true
                         html_table.children[object.name].className = 'SelectedRow'
-                        table.row_switcher(object)
                     }
                     break
                 case T_SPECIES:
@@ -257,9 +265,9 @@
         }
 
         // Build plot on selected rows
-        buildPlot() {
+        buildPlots() {
             // Filter selected rows in json data
-            var json_filtered = this.#json.data.filter(element => this.#checkedRows.includes(element.id))
+            var json_filtered = this.#json.data.filter(element => this.#checkedRows.includes(parseInt(element.id)))
 
             var SMR_min = {
                 x: [],
@@ -387,7 +395,10 @@
         fishresp_json = sessionStorage.getItem("fishresp_json")
         if (fishresp_json) {
             // Restore the contents of json data
+            table.restore_checkedRows()
             table.update(fishresp_json)
+            // Update plots
+            table.buildPlots()
         }
         else
             // TODO: send request to server for last TABLE_ROWS lines
