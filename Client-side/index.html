@@ -38,6 +38,8 @@
 
         #pages = {current: 1, count: 1} // dict contain page data
 
+        #filters = {} // dict contain filters values
+
         // Method to update json data
         parse_json(data) {
             if(data) {
@@ -389,6 +391,47 @@
             Plotly.newPlot('SMR', SMR_data, layout);
             Plotly.newPlot('MMR', MMR_data, layout);
         }
+
+        // Update fiters dict
+        updateFilter(caller) {
+            // let value = null
+            // switch(caller.type)
+            // {
+            //     case "text":
+            //         value = caller.value
+            //         break;
+            //     default:
+            //         console.log("Error: unknown filter type "+ caller.type)
+            // }
+            
+            // this.#filters[caller.id] = value
+            this.#filters[caller.id] = caller.value
+
+            this.loadData()
+        }
+
+        // Request data from server
+        loadData() {
+            // Enable lock
+            switchLock()
+
+            // Sync request
+            var xhr = new XMLHttpRequest()
+            xhr.addEventListener("readystatechange", function () {
+                if (this.readyState === 4) {
+                    table.update(this.responseText)
+                    // Disable lock
+                    switchLock()       
+                }
+            })
+            xhr.timeout = 4000; // Set timeout to 4 seconds (4000 milliseconds)
+            xhr.addEventListener("timeout", function () {
+                console.log('Connection timeout')
+            })
+            // TODO: replace ip by server address
+            xhr.open("POST", "http://127.0.0.1:4747/")
+            xhr.send(JSON.stringify(this.#filters))
+        }
     } 
 
     let table = new Table
@@ -396,16 +439,18 @@
     // Function to initialize filters and autosave 
     function init() {
         fishresp_json = sessionStorage.getItem("fishresp_json")
+        // if has autosave
         if (fishresp_json) {
-            // Restore the contents of json data
-            table.restore_checkedRows()
-            table.update(fishresp_json)
-            // Update plots
-            table.buildPlots()
+            table.restore_checkedRows() // Restore the contents of checked rows 
+            table.update(fishresp_json) // Restore the contents of json data
+            table.buildPlots() // Build plots
         }
         else
-            // TODO: send request to server for last TABLE_ROWS lines
-            table.update() // Gen empty table
+        {
+            table.loadData() // Request server for new data
+            table.update() // Gen table for new data
+            table.buildPlots() // Build plots
+        }
     }
     
     // function to block the page while loading
@@ -457,7 +502,6 @@
 '
         sessionStorage.setItem("fishresp_json", json_text)
         table.update(json_text)
-
     }
     </script>
 
@@ -471,8 +515,11 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            background-color: #50505050;
+            background-color: #90909050;
             visibility: hidden;
+            line-height: 100vh;
+            font-size: larger;
+            text-align: center;
         }
 
         /* Select/unselect rows for widgets */
@@ -497,7 +544,7 @@
         /* Disable borders for inputs in filters */
         input.Unbordered{
             border: 0px solid;
-            max-width: 2.4rem;
+            max-width: 5rem;
         }
         
         /* Divs container */
@@ -542,21 +589,27 @@
                     </tr>
                     <tr>
                         <td class="disabled">Filters:</td>
-                        <td><input class="Unbordered" id="filter_Species" placeholder="Name"></td>
-                        <td><input class="Unbordered" id="filter_Publication" placeholder="DOI"></td>
-                        <td><input class="Unbordered" id="filter_Temperature" placeholder="min">-<input class="Unbordered" id="filter_Temperature" placeholder="max"></td>
-                        <td><input class="Unbordered" id="filter_Salinity" placeholder="min">-<input class="Unbordered" id="filter_Salinity" placeholder="max"></td>
-                        <td><input class="Unbordered" id="filter_DO level" placeholder="min">-<input class="Unbordered" id="filter_DO level" placeholder="max"></td>
-                        <td><input class="Unbordered" id="filter_SMR avg" placeholder="min">-<input class="Unbordered" id="filter_SMR avg" placeholder="max"></td>
-                        <td><input class="Unbordered" id="filter_SMR min" placeholder="min">-<input class="Unbordered" id="filter_SMR min" placeholder="max"></td>
-                        <td><input class="Unbordered" id="filter_SMR max" placeholder="min">-<input class="Unbordered" id="filter_SMR max" placeholder="max"></td>
-                        <td><input class="Unbordered" id="filter_MMR avg" placeholder="min">-<input class="Unbordered" id="filter_MMR avg" placeholder="max"></td>
-                        <td><input class="Unbordered" id="filter_MMR min" placeholder="min">-<input class="Unbordered" id="filter_MMR min" placeholder="max"></td>
-                        <td><input class="Unbordered" id="filter_MMR max" placeholder="min">-<input class="Unbordered" id="filter_MMR max" placeholder="max"></td>
-                        <td><input class="Unbordered" id="filter_MMR method" placeholder="min">-<input class="Unbordered" id="filter_MMR method" placeholder="max"></td>
-                        <td><input class="Unbordered" id="filter_Mass avg" placeholder="min">-<input class="Unbordered" id="filter_Mass avg" placeholder="max"></td>
-                        <td><input class="Unbordered" id="filter_BR test" placeholder="min">-<input class="Unbordered" id="filter_BR test" placeholder="max"></td>
+                        <datalist id="Species_list">
+                            <!-- todo: make php fill Species list -->
+                            <option value="fish_1">
+                            <option value="fish_2">
+                        </datalist>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Species" placeholder="Name" list="Species_list"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Publication" placeholder="DOI"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Temperature" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Temperature" placeholder="max"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Salinity" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Salinity" placeholder="max"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_DO level" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_DO level" placeholder="max"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR avg" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR avg" placeholder="max"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR min" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR min" placeholder="max"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR max" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR max" placeholder="max"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR avg" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR avg" placeholder="max"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR min" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR min" placeholder="max"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR max" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR max" placeholder="max"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR method" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR method" placeholder="max"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Mass avg" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Mass avg" placeholder="max"></td>
+                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_BR test" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_BR test" placeholder="max"></td>
                         <td class="disabled"></td>
+                        </form>
                     </tr>
                 </tbody>
 
@@ -578,6 +631,6 @@
     <button onclick="uploadTestData()">Upload test data</button>
     <button onclick="switchLock()">Enable hover</button>
     <!-- Hover for loading data -->
-    <div id="hover" class="hover"></div>
+    <div id="hover" class="hover">Loading...</div>
 </body>
 </html>
