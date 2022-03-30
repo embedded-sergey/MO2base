@@ -1,3 +1,6 @@
+<?php
+require_once 'database.php';
+?>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -590,9 +593,19 @@
                     <tr>
                         <td class="disabled">Filters:</td>
                         <datalist id="Species_list">
-                            <!-- todo: make php fill Species list -->
-                            <option value="fish_1">
-                            <option value="fish_2">
+                            <?php
+                                // Request Species list from DB
+                                $stmt = $DB->query("SELECT name FROM species;");
+                                while ($row = $stmt->fetch())
+                                {
+                                    echo '<option value="' . $row['name'] . '">';
+                                }
+                            ?>
+                        </datalist>
+                        <datalist id="Species_list">
+                            <option value="">
+                            <option value="Yes">
+                            <option value="No">
                         </datalist>
                         <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Species" placeholder="Name" list="Species_list"></td>
                         <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Publication" placeholder="DOI"></td>
@@ -607,7 +620,17 @@
                         <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR max" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR max" placeholder="max"></td>
                         <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR method" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR method" placeholder="max"></td>
                         <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Mass avg" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Mass avg" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_BR test" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_BR test" placeholder="max"></td>
+                        <td><select class="Unbordered" onchange="table.updateFilter(this)" id="filter_BR test">
+                            <option value=""></option>
+                            <?php
+                                // Request Species list from DB
+                                $stmt = $DB->query("SELECT name FROM mmr_method;");
+                                while ($row = $stmt->fetch())
+                                {
+                                    echo '<option value="' . $row['name'] . '">' . $row['name'] . '</option>';
+                                }
+                            ?>
+                        </select></td>
                         <td class="disabled"></td>
                         </form>
                     </tr>
