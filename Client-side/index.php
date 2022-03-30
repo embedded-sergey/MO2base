@@ -101,7 +101,6 @@ require_once 'database.php';
             if (this.#json.count % TABLE_ROWS > 0)
                 this.#pages.count++
             
-            this.#pages.count = 8 // TODO: remove 
             // Gen html code
             var pages_counter = document.getElementById('pages_counter')
             pages_counter.innerHTML = ""
@@ -114,9 +113,9 @@ require_once 'database.php';
             pages_counter.innerHTML += "<a style='font-weight:bold;' onclick='table.selectPage("+this.#pages.current+")'>"+this.#pages.current+"</a>"
             if ((this.#pages.current+1) < this.#pages.count)
                 pages_counter.innerHTML += "<a onclick='table.selectPage("+(this.#pages.current+1)+")'>"+(this.#pages.current+1)+"</a>"
-            if (this.page+1 < this.#pages.count)
+            if (this.#pages.current+1 < this.#pages.count)
                 pages_counter.innerHTML += "..."
-            if (this.page != this.#pages.count)
+            if (this.#pages.current != this.#pages.count)
                 pages_counter.innerHTML += "<a onclick='table.selectPage("+this.#pages.count+")'>"+this.#pages.count+"</a>"
         }
         // Select page
