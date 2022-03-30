@@ -29,94 +29,237 @@
     const T_BR_TEST = 14
     const T_COMMENT = 15
  
-    // Dict-container for table data
-    var table = {
-        // Variable for data from server
-        json: {
-            values: {count: 0, data: []}, // Parsed values
-            deleteUnselected: function() {
-                // Remove unselected values
-                this.values.data = this.values.data.filter(element => table.checkedRows.includes(element.id))
-                this.values.count = this.values.data.lenght
-            },
-            parse: function (json_data) {
-                if(json_data) {
-                    // Remove unchecked rows in table
-                    this.deleteUnselected()
-                    // Parse new data
-                    var values = JSON.parse(json_data);
-                    // Remove duplicates with old checked data
-                    values.data = values.data.filter(element => !table.checkedRows.includes(element.id))
-                    // Append new to old values
-                    this.values.data = this.values.data.concat(values.data)
-                    // Calc new lenght
-                    this.values.count = this.values.data.length
-                    // Save data
-                    sessionStorage.setItem("fishresp_autosave", json_data)
-                }
+    // Class for table data
+    class Table {
+        
+        #json = {count: 0, data: []} // private field, contains json data
+
+        #checkedRows = [] // list contain selected rows by json indexes TODO: save between page refresh
+
+        #pages = {current: 1, count: 1} // dict contain page data
+
+        // Method to update json data
+        parse_json(data) {
+            if(data) {
+                // Remove unchecked rows in table
+                this.#json.data = this.#json.data.filter(element => table.#checkedRows.includes(element.id))
+                // Parse new data
+                var new_json = JSON.parse(data);
+                // Remove duplicates with old checked data
+                new_json.data = new_json.data.filter(element => !this.#checkedRows.includes(element.id))
+                // Append new to old values
+                this.#json.data = this.#json.data.concat(new_json.data)
+                // Calc new lenght
+                this.#json.count = this.#json.data.length
+                // Save data
+                //sessionStorage.setItem("fishresp_json", this.#json.stringify())
             }
-        },
-        page: 1, // Current page
-        pagesCount: 1, // Pages count
-        checkedRows: [], // list contain selected rows by json indexes TODO: save between page refresh
+        }
+
+        // Method to select/deselect rows by json indexes
+        row_switcher(checkbox) {
+            // Getting table for filling
+            var html_table = document.getElementById("table")
+
+            if (html_table.children[checkbox.name].className == 'SelectedRow') {
+                // Remove selection color
+                html_table.children[checkbox.name].className = 'UnselectedRow'
+                // Remove row from selected rows list
+                this.#checkedRows = this.#checkedRows.filter(element => element != checkbox.value)
+            }
+            else {
+                // Set selection color
+                html_table.children[checkbox.name].className = 'SelectedRow'
+                // Add row to selected rows list
+                this.#checkedRows.push(checkbox.value)
+            }
+            this.buildPlot()
+            sessionStorage.setItem("fishresp_checkedRows", this.#checkedRows)
+        }
+
         // Update page counter
-        pageCouter: function() {
+        pageCouter() {
             // Calc pages count
-            this.pagesCount = parseInt(this.json.values.count / TABLE_ROWS)
-            if (this.json.values.count % TABLE_ROWS > 0)
-                this.pagesCount++
-                
-            this.pagesCount = 8
+            this.#pages.count = parseInt(this.#json.count / TABLE_ROWS)
+            if (this.#json.count % TABLE_ROWS > 0)
+                this.#pages.count++
+            
+            this.#pages.count = 8 // TODO: remove 
+            // Gen html code
             var pages_counter = document.getElementById('pages_counter')
             pages_counter.innerHTML = ""
-            if (this.page > 1)
+            if (this.#pages.current > 1)
                 pages_counter.innerHTML = "<a onclick='table.selectPage(1)'>1</a>"
-            if (this.page > 3)
+            if (this.#pages.current > 3)
                 pages_counter.innerHTML += "..."
-            if ((this.page-1) > 1)
-                pages_counter.innerHTML += "<a onclick='table.selectPage("+(this.page-1)+")'>"+(this.page-1)+"</a>"
-            pages_counter.innerHTML += "<a style='font-weight:bold;' onclick='table.selectPage("+this.page+")'>"+this.page+"</a>"
-            if ((this.page+1) < this.pagesCount)
-                pages_counter.innerHTML += "<a onclick='table.selectPage("+(this.page+1)+")'>"+(this.page+1)+"</a>"
-            if (this.page+1 < this.pagesCount)
+            if ((this.#pages.current-1) > 1)
+                pages_counter.innerHTML += "<a onclick='table.selectPage("+(this.#pages.current-1)+")'>"+(this.#pages.current-1)+"</a>"
+            pages_counter.innerHTML += "<a style='font-weight:bold;' onclick='table.selectPage("+this.#pages.current+")'>"+this.#pages.current+"</a>"
+            if ((this.#pages.current+1) < this.#pages.count)
+                pages_counter.innerHTML += "<a onclick='table.selectPage("+(this.#pages.current+1)+")'>"+(this.#pages.current+1)+"</a>"
+            if (this.page+1 < this.#pages.count)
                 pages_counter.innerHTML += "..."
-            if (this.page != this.pagesCount)
-                pages_counter.innerHTML += "<a onclick='table.selectPage("+this.pagesCount+")'>"+this.pagesCount+"</a>"
-        },
+            if (this.page != this.#pages.count)
+                pages_counter.innerHTML += "<a onclick='table.selectPage("+this.#pages.count+")'>"+this.#pages.count+"</a>"
+        }
         // Select page
-        selectPage: function(page) {
-            this.page = page // Remember the memory page
+        selectPage(page) {
+            this.#pages.current = page // Remember the memory page
 
             // Getting table for filling
             var html_table = document.getElementById("table")
             // Cleanup old data
             while(html_table.hasChildNodes())
                 html_table.removeChild(html_table.firstChild);
-            
+        
             // Calc current index for selected page
-            var curent_index = (this.page-1) * TABLE_ROWS
+            var curent_index = (this.#pages.current-1) * TABLE_ROWS
 
             // Fill table
-            for (row = 0; row < TABLE_ROWS; row++) {
+            for (let row = 0; row < TABLE_ROWS; row++) {
                 var current_row = html_table.insertRow(row)
                 current_row.className = 'UnselectedRow'
-                for (column = 0; column < TABLE_COLUMS; column++) {
+                for (let column = 0; column < TABLE_COLUMS; column++) {
                     var current_column = current_row.insertCell(column)
-                    if (curent_index < this.json.values.count)
+                    if (curent_index < this.#json.count)
                         current_column.appendChild(this.fill_table_cell(column, row, curent_index))
                 }
                 curent_index++
             }       
             this.pageCouter() // Update page counter
-        },
+        }
+
         // Update table data, when new json received
-        update: function(json_data) {
-            this.json.parse(json_data) // Parse and store json values
+        update(json_data) {
+            this.parse_json(json_data) // Parse and store json values
             this.selectPage(1) // Fill first table page  
-        },
-        buildPlot: function() {
+        }
+
+        // Fill table cell with indexes
+        fill_table_cell(column, row, curent_index) {
+            var object = null
+            var html_table = document.getElementById("table")
+            // Create object for column
+            switch (column) {
+                case T_CHECKBOX:
+                    object = document.createElement("input");
+                    object.type = "checkbox";
+                    object.name = row
+                    object.value = this.#json.data[curent_index].id;
+                    object.id = "id" + column + "_" + row;
+                    // object.name = "name" + json.items[i].name;
+                    // On change function
+                    object.onchange = function() {
+                        table.row_switcher(object)
+                    }
+                    
+                    // Checking if selecting this row is needed
+                    if (this.#checkedRows.includes(object.value)) {
+                        object.checked = true
+                        html_table.children[object.name].className = 'SelectedRow'
+                        table.row_switcher(object)
+                    }
+                    break
+                case T_SPECIES:
+                    var value = this.#json.data[curent_index].Species
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_PUBLICATION:
+                    var value = this.#json.data[curent_index].Publication
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_TEMPERATURE:
+                    var value = this.#json.data[curent_index].Temperature
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_SALINITY:
+                    var value = this.#json.data[curent_index].Salinity
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_DO_LEVEL:
+                    var value = this.#json.data[curent_index].DO_level
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_SMR_AVG:
+                    var value = this.#json.data[curent_index].SMR_avg
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_SMR_MIN:
+                    var value = this.#json.data[curent_index].SMR_min
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_SMR_MAX:
+                    var value = this.#json.data[curent_index].SMR_max
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_MMR_AVG:
+                    var value = this.#json.data[curent_index].MMR_avg
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_MMR_MIN:
+                    var value = this.#json.data[curent_index].MMR_min
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_MMR_MAX:
+                    var value = this.#json.data[curent_index].MMR_max
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_MMR_METHOD:
+                    var value = this.#json.data[curent_index].MMR_method
+                    if (value == undefined)
+                        value = 'no'
+                    object = document.createTextNode(value)
+                    break
+                case T_MASS_AVG:
+                    var value = this.#json.data[curent_index].Mass_avg
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_BR_TEST:
+                    var value = this.#json.data[curent_index].BR_test
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                case T_COMMENT:
+                    var value = this.#json.data[curent_index].Comment
+                    if (value == undefined)
+                        value = ''
+                    object = document.createTextNode(value)
+                    break
+                default:
+                    object = document.createTextNode("")
+            } 
+            return object
+        }
+
+        // Build plot on selected rows
+        buildPlot() {
             // Filter selected rows in json data
-            var json_filtered = table.json.values.data.filter(element => table.checkedRows.includes(element.id))
+            var json_filtered = this.#json.data.filter(element => this.#checkedRows.includes(element.id))
 
             var SMR_min = {
                 x: [],
@@ -176,7 +319,7 @@
                 }
             };
             
-            for (i = 0; i < json_filtered.length; i++) {
+            for (let i = 0; i < json_filtered.length; i++) {
                 if (json_filtered[i].Species == undefined) {
                     SMR_avg.x.push('')
                     SMR_min.x.push('')
@@ -234,147 +377,17 @@
             var layout = {barmode: 'stack'};
             Plotly.newPlot('SMR', SMR_data, layout);
             Plotly.newPlot('MMR', MMR_data, layout);
-        },
-        // Fill table cell with indexes
-        fill_table_cell: function(column, row, curent_index) {
-            var object = null
-            var html_table = document.getElementById("table")
-            // Create object for column
-            switch (column) {
-                case T_CHECKBOX:
-                    object = document.createElement("input");
-                    object.type = "checkbox";
-                    object.name = row
-                    object.value = this.json.values.data[curent_index].id;
-                    object.id = "id" + column + "_" + row;
-                    // object.name = "name" + json.items[i].name;
-                    // On change function
-                    object.onchange = function() {
-                        if (html_table.children[object.name].className == 'SelectedRow') {
-                            // Remove selection color
-                            html_table.children[object.name].className = 'UnselectedRow'
-                            // Remove row from selected rows list
-                            table.checkedRows = table.checkedRows.filter(element => element != object.value)
-                        }
-                        else {
-                            // Set selection color
-                            html_table.children[object.name].className = 'SelectedRow'
-                            // Add row to selected rows list
-                            table.checkedRows.push(object.value)
-                        }
-                        table.buildPlot()
-                    }
-                    
-                    // Checking if selecting this row is needed
-                    if (table.checkedRows.includes(object.value)) {
-                        object.checked = true
-                        html_table.children[object.name].className = 'SelectedRow'
-                        table.checkedRows.push(object.value)
-                        table.buildPlot()
-                    }
-                    break
-                case T_SPECIES:
-                    var value = this.json.values.data[curent_index].Species
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_PUBLICATION:
-                    var value = this.json.values.data[curent_index].Publication
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_TEMPERATURE:
-                    var value = this.json.values.data[curent_index].Temperature
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_SALINITY:
-                    var value = this.json.values.data[curent_index].Salinity
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_DO_LEVEL:
-                    var value = this.json.values.data[curent_index].DO_level
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_SMR_AVG:
-                    var value = this.json.values.data[curent_index].SMR_avg
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_SMR_MIN:
-                    var value = this.json.values.data[curent_index].SMR_min
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_SMR_MAX:
-                    var value = this.json.values.data[curent_index].SMR_max
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_MMR_AVG:
-                    var value = this.json.values.data[curent_index].MMR_avg
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_MMR_MIN:
-                    var value = this.json.values.data[curent_index].MMR_min
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_MMR_MAX:
-                    var value = this.json.values.data[curent_index].MMR_max
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_MMR_METHOD:
-                    var value = this.json.values.data[curent_index].MMR_method
-                    if (value == undefined)
-                        value = 'no'
-                    object = document.createTextNode(value)
-                    break
-                case T_MASS_AVG:
-                    var value = this.json.values.data[curent_index].Mass_avg
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_BR_TEST:
-                    var value = this.json.values.data[curent_index].BR_test
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_COMMENT:
-                    var value = this.json.values.data[curent_index].Comment
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                default:
-                    object = document.createTextNode("")
-            } 
-            return object
         }
-    }
+    } 
+
+    let table = new Table
 
     // Function to initialize filters and autosave 
     function init() {
-        if (sessionStorage.getItem("fishresp_autosave")) {
+        fishresp_json = sessionStorage.getItem("fishresp_json")
+        if (fishresp_json) {
             // Restore the contents of json data
-            table.update(sessionStorage.getItem("fishresp_autosave"))
+            table.update(fishresp_json)
         }
         else
             // TODO: send request to server for last TABLE_ROWS lines
@@ -428,7 +441,7 @@
     ]\
 }\
 '
-        sessionStorage.setItem("fishresp_autosave", json_text)
+        sessionStorage.setItem("fishresp_json", json_text)
         table.update(json_text)
 
     }
