@@ -1,7 +1,7 @@
 <?php
 require_once 'database.php';
 
-$db_request = 'SELECT td.id, td.json_id, td.caption, td.filter_placeholder, 
+$db_request = 'SELECT td.id, td.json_ident, td.caption, td.filter_placeholder, 
 f.html_code,
 cell.code
 FROM table_data td
@@ -26,7 +26,7 @@ $table_data = $DB->query($db_request)->fetchAll();
     // Define rows names for create-switches
     const T_CHECKBOX = 0
 <?php foreach($table_data as $row): ?>
-    const T_<?=strtoupper($row['json_id'])?> = <?=$row['id']?>
+    const T_<?=strtoupper($row['json_ident'])?> = <?=$row['id']?>
 
 <?php endforeach ?>
  
@@ -175,8 +175,8 @@ $table_data = $DB->query($db_request)->fetchAll();
                     break
                     
 <?php foreach($table_data as $row): ?>
-                case T_<?=strtoupper($row['json_id'])?>:
-                    <?=str_replace('%JSON_ID%', $row['json_id'], $row['code'])?>
+                case T_<?=strtoupper($row['json_ident'])?>:
+                    <?=str_replace('%JSON_ID%', $row['json_ident'], $row['code'])?>
 
                     break
 <?php endforeach ?>
@@ -341,7 +341,7 @@ $table_data = $DB->query($db_request)->fetchAll();
             var xhr = new XMLHttpRequest()
             xhr.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
-                    // console.log(this.responseText)
+                    console.log(this.responseText)
                     table.update(this.responseText)
                     // Disable lock
                     switchLock()       
@@ -520,7 +520,7 @@ $table_data = $DB->query($db_request)->fetchAll();
                         $tags = array('%ID%', '%PLACEHOLDER%'); 
                         foreach($table_data as $row) 
                         {
-                            $values = array($row['json_id'], $row['filter_placeholder']);
+                            $values = array($row['json_ident'], $row['filter_placeholder']);
                             echo '<td>' . str_replace($tags, $values, $row['html_code']) . '</td>';
                         }
                         ?>
