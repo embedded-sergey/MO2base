@@ -1,7 +1,7 @@
 <?php
 require_once 'database.php';
 
-$db_request = 'SELECT td.id, td.json_ident, td.caption, td.filter_placeholder, 
+$db_request = 'SELECT td.id, td.json_ident, td.caption, td.filter_placeholder,
 f.html_code,
 cell.code
 FROM table_data td
@@ -374,6 +374,25 @@ $table_data = $DB->query($db_request)->fetchAll();
             table.update() // Gen empty table if nothing loaded
             table.buildPlots() // Build plots
         }
+        set_mmr_methods()
+    }
+
+    // init mmr_methods select options
+    function set_mmr_methods() {
+        select = document.getElementById('mmr_method');
+        <?php
+            // Request Species list from DB
+            $stmt = $DB->query("SELECT * FROM mmr_method;");
+            while ($row = $stmt->fetch())
+            {
+                echo '
+        var opt = document.createElement("option");
+        opt.value = "' . $row['name'] . '";
+        opt.innerHTML = "' . $row['name'] . '";
+        select.appendChild(opt)';
+            }
+        ?>
+        
     }
     
     // function to block the page while loading
@@ -500,7 +519,7 @@ $table_data = $DB->query($db_request)->fetchAll();
                     </tr>
                     <tr>
                         <td class="disabled">Filters:</td>
-                        <datalist id="Species_list">
+                        <datalist id="species_list">
                             <?php
                                 // Request Species list from DB
                                 $stmt = $DB->query("SELECT name FROM species;");
@@ -509,11 +528,6 @@ $table_data = $DB->query($db_request)->fetchAll();
                                     echo '<option value="' . $row['name'] . '">';
                                 }
                             ?>
-                        </datalist>
-                        <datalist id="Species_list">
-                            <option value="">
-                            <option value="Yes">
-                            <option value="No">
                         </datalist>
                         
                         <?php
@@ -525,18 +539,9 @@ $table_data = $DB->query($db_request)->fetchAll();
                         }
                         ?>
 
-                        <!-- <td><select class="Unbordered" onchange="table.updateFilter(this)" id="filter_BR test">
-                            <option value=""></option>
-                            <?php
-                                // Request Species list from DB
-                                $stmt = $DB->query("SELECT name FROM mmr_method;");
-                                while ($row = $stmt->fetch())
-                                {
-                                    echo '<option value="' . $row['name'] . '">' . $row['name'] . '</option>';
-                                }
-                            ?>
-                        </select></td>
-                        <td class="disabled"></td> -->
+                        <!-- 
+                        <td class="disabled"></td>
+                         -->
                         </form>
                     </tr>
                 </tbody>
