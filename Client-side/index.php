@@ -1,3 +1,6 @@
+<?php
+require_once 'database.php';
+?>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -98,7 +101,6 @@
             if (this.#json.count % TABLE_ROWS > 0)
                 this.#pages.count++
             
-            this.#pages.count = 8 // TODO: remove 
             // Gen html code
             var pages_counter = document.getElementById('pages_counter')
             pages_counter.innerHTML = ""
@@ -111,9 +113,9 @@
             pages_counter.innerHTML += "<a style='font-weight:bold;' onclick='table.selectPage("+this.#pages.current+")'>"+this.#pages.current+"</a>"
             if ((this.#pages.current+1) < this.#pages.count)
                 pages_counter.innerHTML += "<a onclick='table.selectPage("+(this.#pages.current+1)+")'>"+(this.#pages.current+1)+"</a>"
-            if (this.page+1 < this.#pages.count)
+            if (this.#pages.current+1 < this.#pages.count)
                 pages_counter.innerHTML += "..."
-            if (this.page != this.#pages.count)
+            if (this.#pages.current != this.#pages.count)
                 pages_counter.innerHTML += "<a onclick='table.selectPage("+this.#pages.count+")'>"+this.#pages.count+"</a>"
         }
         // Select page
@@ -174,91 +176,91 @@
                     }
                     break
                 case T_SPECIES:
-                    var value = this.#json.data[curent_index].Species
+                    var value = this.#json.data[curent_index].species
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_PUBLICATION:
-                    var value = this.#json.data[curent_index].Publication
+                    var value = this.#json.data[curent_index].publication
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_TEMPERATURE:
-                    var value = this.#json.data[curent_index].Temperature
+                    var value = this.#json.data[curent_index].temperature
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_SALINITY:
-                    var value = this.#json.data[curent_index].Salinity
+                    var value = this.#json.data[curent_index].salinity
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_DO_LEVEL:
-                    var value = this.#json.data[curent_index].DO_level
+                    var value = this.#json.data[curent_index].do_level
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_SMR_AVG:
-                    var value = this.#json.data[curent_index].SMR_avg
+                    var value = this.#json.data[curent_index].smr_avg
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_SMR_MIN:
-                    var value = this.#json.data[curent_index].SMR_min
+                    var value = this.#json.data[curent_index].smr_min
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_SMR_MAX:
-                    var value = this.#json.data[curent_index].SMR_max
+                    var value = this.#json.data[curent_index].smr_max
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_MMR_AVG:
-                    var value = this.#json.data[curent_index].MMR_avg
+                    var value = this.#json.data[curent_index].mmr_avg
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_MMR_MIN:
-                    var value = this.#json.data[curent_index].MMR_min
+                    var value = this.#json.data[curent_index].mmr_min
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_MMR_MAX:
-                    var value = this.#json.data[curent_index].MMR_max
+                    var value = this.#json.data[curent_index].mmr_max
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_MMR_METHOD:
-                    var value = this.#json.data[curent_index].MMR_method
+                    var value = this.#json.data[curent_index].mmr_method
                     if (value == undefined)
                         value = 'no'
                     object = document.createTextNode(value)
                     break
                 case T_MASS_AVG:
-                    var value = this.#json.data[curent_index].Mass_avg
+                    var value = this.#json.data[curent_index].mass_avg
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_BR_TEST:
-                    var value = this.#json.data[curent_index].BR_test
+                    var value = this.#json.data[curent_index].br_test
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
                     break
                 case T_COMMENT:
-                    var value = this.#json.data[curent_index].Comment
+                    var value = this.#json.data[curent_index].comment
                     if (value == undefined)
                         value = ''
                     object = document.createTextNode(value)
@@ -331,9 +333,9 @@
                     color: 'rgb(142,0,0)'
                 }
             };
-            
+            // TODO: this one wrong at smr/mmr at one if
             for (let i = 0; i < json_filtered.length; i++) {
-                if (json_filtered[i].Species == undefined) {
+                if (json_filtered[i].species == undefined) {
                     SMR_avg.x.push('')
                     SMR_min.x.push('')
                     SMR_max.x.push('')
@@ -342,45 +344,58 @@
                     MMR_max.x.push('')
                 }
                 else {
-                    SMR_avg.x.push(json_filtered[i].Species)
-                    SMR_min.x.push(json_filtered[i].Species)
-                    SMR_max.x.push(json_filtered[i].Species)
-                    MMR_avg.x.push(json_filtered[i].Species)
-                    MMR_min.x.push(json_filtered[i].Species)
-                    MMR_max.x.push(json_filtered[i].Species)
+                    SMR_avg.x.push(json_filtered[i].species)
+                    SMR_min.x.push(json_filtered[i].species)
+                    SMR_max.x.push(json_filtered[i].species)
+                    MMR_avg.x.push(json_filtered[i].species)
+                    MMR_min.x.push(json_filtered[i].species)
+                    MMR_max.x.push(json_filtered[i].species)
                 }
-                if (json_filtered[i].SMR_avg == undefined) {
+
+                if (json_filtered[i].smr_avg == undefined) {
                     SMR_avg.y.push(0)
+                }
+                else {
+                    SMR_avg.y.push(json_filtered[i].smr_avg)
+                }
+                if (json_filtered[i].smr_min == undefined) {
+                    SMR_min.y.push(0)
+                }
+                else {
+                    SMR_min.y.push(json_filtered[i].smr_min)
+                }
+                if (json_filtered[i].smr_max == undefined) {
+                    SMR_max.y.push(0)
+                }
+                else {
+                    SMR_max.y.push(json_filtered[i].smr_max)
+                }
+                if (json_filtered[i].mmr_avg == undefined) {
                     MMR_avg.y.push(0)
                 }
                 else {
-                    SMR_avg.y.push(json_filtered[i].SMR_avg)
-                    MMR_avg.y.push(json_filtered[i].MMR_avg)
+                    MMR_avg.y.push(json_filtered[i].mmr_avg)
                 }
-                if (json_filtered[i].SMR_min == undefined) {
-                    SMR_min.y.push(0)
+                if (json_filtered[i].mmr_min == undefined) {
                     MMR_min.y.push(0)
                 }
                 else {
-                    SMR_min.y.push(json_filtered[i].SMR_min)
-                    MMR_min.y.push(json_filtered[i].MMR_min)
+                    MMR_min.y.push(json_filtered[i].mmr_min)
                 }
-                if (json_filtered[i].SMR_max == undefined) {
-                    SMR_max.y.push(0)
+                if (json_filtered[i].mmr_max == undefined) {
                     MMR_max.y.push(0)
                 }
                 else {
-                    SMR_max.y.push(json_filtered[i].SMR_max)
-                    MMR_max.y.push(json_filtered[i].MMR_max)
+                    MMR_max.y.push(json_filtered[i].mmr_max)
                 }
 
-                if (json_filtered[i].Publication == undefined) {
+                if (json_filtered[i].publication == undefined) {
                     SMR_avg.text.push('')
                     MMR_avg.text.push('')
                 }
                 else {
-                    SMR_avg.text.push(json_filtered[i].Publication)
-                    MMR_avg.text.push(json_filtered[i].Publication)
+                    SMR_avg.text.push(json_filtered[i].publication)
+                    MMR_avg.text.push(json_filtered[i].publication)
                 }
 
             }
@@ -419,6 +434,7 @@
             var xhr = new XMLHttpRequest()
             xhr.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
+                    // console.log(this.responseText)
                     table.update(this.responseText)
                     // Disable lock
                     switchLock()       
@@ -429,7 +445,7 @@
                 console.log('Connection timeout')
             })
             // TODO: replace ip by server address
-            xhr.open("POST", "http://127.0.0.1:4747/")
+            xhr.open("POST", "http://127.0.0.1:81/filters.php")
             xhr.send(JSON.stringify(this.#filters))
         }
     } 
@@ -448,7 +464,7 @@
         else
         {
             table.loadData() // Request server for new data
-            table.update() // Gen table for new data
+            table.update() // Gen empty table if nothing loaded
             table.buildPlots() // Build plots
         }
     }
@@ -472,29 +488,29 @@
     "data":[\
         {\
             "id":1,\
-            "Species":"fish_1",\
-            "Publication":"213/321",\
-            "Temperature":24,\
-            "Salinity":"0",\
-            "DO_level":100,\
-            "SMR_avg":120\
+            "species":"fish_1",\
+            "publication":"213/321",\
+            "temperature":24,\
+            "salinity":"0",\
+            "do_level":100,\
+            "smr_avg":120\
         },\
         {\
             "id":2,\
-            "Species":"fish_2",\
-            "Publication":"213/321",\
-            "Temperature":12,\
-            "Salinity":"0",\
-            "DO_level":100,\
-            "SMR_avg":89,\
-            "SMR_min":65,\
-            "SMR_max":144,\
-            "MMR_avg":163,\
-            "MMR_min":159,\
-            "MMR_max":354,\
-            "MMR_method":"Ucrit",\
-            "Mass_avg":20,\
-            "BR_test":"yes",\
+            "species":"fish_2",\
+            "publication":"213/321",\
+            "temperature":12,\
+            "salinity":"0",\
+            "do_level":100,\
+            "smr_avg":89,\
+            "smr_min":65,\
+            "smr_max":144,\
+            "smr_avg":163,\
+            "smr_min":159,\
+            "smr_max":354,\
+            "smr_method":"Ucrit",\
+            "mass_avg":20,\
+            "br_test":"yes",\
             "Comment":"Fish 2 comment"\
         }\
     ]\
@@ -590,9 +606,19 @@
                     <tr>
                         <td class="disabled">Filters:</td>
                         <datalist id="Species_list">
-                            <!-- todo: make php fill Species list -->
-                            <option value="fish_1">
-                            <option value="fish_2">
+                            <?php
+                                // Request Species list from DB
+                                $stmt = $DB->query("SELECT name FROM species;");
+                                while ($row = $stmt->fetch())
+                                {
+                                    echo '<option value="' . $row['name'] . '">';
+                                }
+                            ?>
+                        </datalist>
+                        <datalist id="Species_list">
+                            <option value="">
+                            <option value="Yes">
+                            <option value="No">
                         </datalist>
                         <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Species" placeholder="Name" list="Species_list"></td>
                         <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Publication" placeholder="DOI"></td>
@@ -607,7 +633,17 @@
                         <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR max" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR max" placeholder="max"></td>
                         <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR method" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR method" placeholder="max"></td>
                         <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Mass avg" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Mass avg" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_BR test" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_BR test" placeholder="max"></td>
+                        <td><select class="Unbordered" onchange="table.updateFilter(this)" id="filter_BR test">
+                            <option value=""></option>
+                            <?php
+                                // Request Species list from DB
+                                $stmt = $DB->query("SELECT name FROM mmr_method;");
+                                while ($row = $stmt->fetch())
+                                {
+                                    echo '<option value="' . $row['name'] . '">' . $row['name'] . '</option>';
+                                }
+                            ?>
+                        </select></td>
                         <td class="disabled"></td>
                         </form>
                     </tr>
