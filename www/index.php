@@ -115,7 +115,7 @@ $table_data = $DB->query($db_request)->fetchAll();
                 pages_counter.innerHTML += "<a onclick='table.selectPage("+(this.#pages.current+1)+")'>"+(this.#pages.current+1)+"</a>"
             if (this.#pages.current+1 < this.#pages.count)
                 pages_counter.innerHTML += "..."
-            if (this.#pages.current != this.#pages.count)
+            if (this.#pages.current < this.#pages.count)
                 pages_counter.innerHTML += "<a onclick='table.selectPage("+this.#pages.count+")'>"+this.#pages.count+"</a>"
         }
         // Select page
