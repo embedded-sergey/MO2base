@@ -2,7 +2,7 @@
 require_once 'database.php';
 
 $db_request = 'SELECT td.id, td.json_id, td.caption, td.filter_placeholder, 
-f.name, f.html_code,
+f.html_code,
 cell.code
 FROM table_data td
 LEFT JOIN filters f on f.id = td.filter_id
