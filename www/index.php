@@ -1,5 +1,14 @@
 <?php
 require_once 'database.php';
+
+$db_request = 'SELECT td.id, td.json_id, td.caption, td.filter_placeholder, 
+f.name, f.html_code,
+cell.code
+FROM table_data td
+LEFT JOIN filters f on f.id = td.filter_id
+LEFT JOIN js_cellcode cell on cell.id = td.js_cellcode_id';
+
+$table_data = $DB->query($db_request)->fetchAll();
 ?>
 <html>
 <head>
@@ -16,21 +25,10 @@ require_once 'database.php';
 
     // Define rows names for create-switches
     const T_CHECKBOX = 0
-    const T_SPECIES = 1
-    const T_PUBLICATION = 2
-    const T_TEMPERATURE = 3
-    const T_SALINITY = 4
-    const T_DO_LEVEL = 5
-    const T_SMR_AVG = 6
-    const T_SMR_MIN = 7
-    const T_SMR_MAX = 8
-    const T_MMR_AVG = 9
-    const T_MMR_MIN = 10
-    const T_MMR_MAX = 11
-    const T_MMR_METHOD = 12
-    const T_MASS_AVG = 13
-    const T_BR_TEST = 14
-    const T_COMMENT = 15
+<?php foreach($table_data as $row): ?>
+    const T_<?=strtoupper($row['json_id'])?> = <?=$row['id']?>
+
+<?php endforeach ?>
  
     // Class for table data
     class Table {
@@ -175,96 +173,14 @@ require_once 'database.php';
                         html_table.children[object.name].className = 'SelectedRow'
                     }
                     break
-                case T_SPECIES:
-                    var value = this.#json.data[curent_index].species
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
+                    
+<?php foreach($table_data as $row): ?>
+                case T_<?=strtoupper($row['json_id'])?>:
+                    <?=str_replace('%JSON_ID%', $row['json_id'], $row['code'])?>
+
                     break
-                case T_PUBLICATION:
-                    var value = this.#json.data[curent_index].publication
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_TEMPERATURE:
-                    var value = this.#json.data[curent_index].temperature
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_SALINITY:
-                    var value = this.#json.data[curent_index].salinity
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_DO_LEVEL:
-                    var value = this.#json.data[curent_index].do_level
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_SMR_AVG:
-                    var value = this.#json.data[curent_index].smr_avg
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_SMR_MIN:
-                    var value = this.#json.data[curent_index].smr_min
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_SMR_MAX:
-                    var value = this.#json.data[curent_index].smr_max
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_MMR_AVG:
-                    var value = this.#json.data[curent_index].mmr_avg
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_MMR_MIN:
-                    var value = this.#json.data[curent_index].mmr_min
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_MMR_MAX:
-                    var value = this.#json.data[curent_index].mmr_max
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_MMR_METHOD:
-                    var value = this.#json.data[curent_index].mmr_method
-                    if (value == undefined)
-                        value = 'no'
-                    object = document.createTextNode(value)
-                    break
-                case T_MASS_AVG:
-                    var value = this.#json.data[curent_index].mass_avg
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_BR_TEST:
-                    var value = this.#json.data[curent_index].br_test
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
-                case T_COMMENT:
-                    var value = this.#json.data[curent_index].comment
-                    if (value == undefined)
-                        value = ''
-                    object = document.createTextNode(value)
-                    break
+<?php endforeach ?>
+
                 default:
                     object = document.createTextNode("")
             } 
@@ -409,16 +325,7 @@ require_once 'database.php';
 
         // Update fiters dict
         updateFilter(caller) {
-            // let value = null
-            // switch(caller.type)
-            // {
-            //     case "text":
-            //         value = caller.value
-            //         break;
-            //     default:
-            //         console.log("Error: unknown filter type "+ caller.type)
-            // }
-            
+
             // this.#filters[caller.id] = value
             this.#filters[caller.id] = caller.value
 
@@ -505,13 +412,13 @@ require_once 'database.php';
             "smr_avg":89,\
             "smr_min":65,\
             "smr_max":144,\
-            "smr_avg":163,\
-            "smr_min":159,\
-            "smr_max":354,\
-            "smr_method":"Ucrit",\
+            "mmr_avg":163,\
+            "mmr_min":159,\
+            "mmr_max":354,\
+            "mmr_method":"Ucrit",\
             "mass_avg":20,\
             "br_test":"yes",\
-            "Comment":"Fish 2 comment"\
+            "comment":"Fish 2 comment"\
         }\
     ]\
 }\
@@ -587,21 +494,9 @@ require_once 'database.php';
                 <tbody>
                     <tr>
                         <td>Select</td>
-                        <td>Species</td>
-                        <td>Publication</td>
-                        <td>Temperature</td>
-                        <td>Salinity</td>
-                        <td>DO level</td>
-                        <td>SMR avg</td>
-                        <td>SMR min</td>
-                        <td>SMR max</td>
-                        <td>MMR avg</td>
-                        <td>MMR min</td>
-                        <td>MMR max</td>
-                        <td>MMR method</td>
-                        <td>Mass avg</td>
-                        <td>BR test</td>
-                        <td>Comment</td>
+                        <?php foreach($table_data as $row): ?>
+                            <td><?=$row['caption']?></td>
+                        <?php endforeach ?>
                     </tr>
                     <tr>
                         <td class="disabled">Filters:</td>
@@ -620,20 +515,17 @@ require_once 'database.php';
                             <option value="Yes">
                             <option value="No">
                         </datalist>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Species" placeholder="Name" list="Species_list"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Publication" placeholder="DOI"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Temperature" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Temperature" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Salinity" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Salinity" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_DO level" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_DO level" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR avg" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR avg" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR min" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR min" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR max" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_SMR max" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR avg" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR avg" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR min" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR min" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR max" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR max" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR method" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_MMR method" placeholder="max"></td>
-                        <td><input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Mass avg" placeholder="min">-<input class="Unbordered" onchange="table.updateFilter(this)" id="filter_Mass avg" placeholder="max"></td>
-                        <td><select class="Unbordered" onchange="table.updateFilter(this)" id="filter_BR test">
+                        
+                        <?php
+                        $tags = array('%ID%', '%PLACEHOLDER%'); 
+                        foreach($table_data as $row) 
+                        {
+                            $values = array($row['json_id'], $row['filter_placeholder']);
+                            echo '<td>' . str_replace($tags, $values, $row['html_code']) . '</td>';
+                        }
+                        ?>
+
+                        <!-- <td><select class="Unbordered" onchange="table.updateFilter(this)" id="filter_BR test">
                             <option value=""></option>
                             <?php
                                 // Request Species list from DB
@@ -644,7 +536,7 @@ require_once 'database.php';
                                 }
                             ?>
                         </select></td>
-                        <td class="disabled"></td>
+                        <td class="disabled"></td> -->
                         </form>
                     </tr>
                 </tbody>
