@@ -325,9 +325,11 @@ $table_data = $DB->query($db_request)->fetchAll();
 
         // Update fiters dict
         updateFilter(caller) {
-
             // this.#filters[caller.id] = value
-            this.#filters[caller.id] = caller.value
+            if (caller.value.length > 0)
+                this.#filters[caller.id] = caller.value
+            else
+                delete this.#filters[caller.id]
 
             this.loadData()
         }
@@ -341,7 +343,7 @@ $table_data = $DB->query($db_request)->fetchAll();
             var xhr = new XMLHttpRequest()
             xhr.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
-                    console.log(this.responseText)
+                    // console.log(this.responseText)
                     table.update(this.responseText)
                     // Disable lock
                     switchLock()       
@@ -392,7 +394,7 @@ $table_data = $DB->query($db_request)->fetchAll();
         select.appendChild(opt)';
             }
         ?>
-        
+
     }
     
     // function to block the page while loading
