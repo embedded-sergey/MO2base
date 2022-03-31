@@ -355,8 +355,7 @@ $table_data = $DB->query($db_request)->fetchAll();
             xhr.addEventListener("timeout", function () {
                 console.log('Connection timeout')
             })
-            // TODO: replace ip by server address
-            xhr.open("POST", "http://127.0.0.1:81/filters.php")
+            xhr.open("POST", "/filters.php")
             xhr.send(JSON.stringify(this.#filters))
         }
     } 
