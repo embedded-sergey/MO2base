@@ -1,13 +1,15 @@
 <?php
+// Connect to database
 require_once 'database.php';
 
+// Request table header
 $db_request = 'SELECT td.id, td.json_ident, td.caption, td.filter_placeholder,
 f.html_code,
 cell.code
 FROM table_data td
 LEFT JOIN filters f on f.id = td.filter_id
 LEFT JOIN js_cellcode cell on cell.id = td.js_cellcode_id';
-
+// Exec request
 $table_data = $DB->query($db_request)->fetchAll();
 ?>
 <html>
@@ -173,14 +175,14 @@ $table_data = $DB->query($db_request)->fetchAll();
                         html_table.children[object.name].className = 'SelectedRow'
                     }
                     break
-                    
+// Gen. cells with table_data parameters
 <?php foreach($table_data as $row): ?>
                 case T_<?=strtoupper($row['json_ident'])?>:
                     <?=str_replace('%JSON_ID%', $row['json_ident'], $row['code'])?>
 
                     break
 <?php endforeach ?>
-
+                // Empty by default
                 default:
                     object = document.createTextNode("")
             } 
@@ -249,7 +251,7 @@ $table_data = $DB->query($db_request)->fetchAll();
                     color: 'rgb(142,0,0)'
                 }
             };
-            // TODO: this one wrong at smr/mmr at one if
+            
             for (let i = 0; i < json_filtered.length; i++) {
                 if (json_filtered[i].species == undefined) {
                     SMR_avg.x.push('')
@@ -330,7 +332,7 @@ $table_data = $DB->query($db_request)->fetchAll();
                 this.#filters[caller.id] = caller.value
             else
                 delete this.#filters[caller.id]
-
+            // Load data with new filters
             this.loadData()
         }
 
@@ -343,7 +345,7 @@ $table_data = $DB->query($db_request)->fetchAll();
             var xhr = new XMLHttpRequest()
             xhr.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
-                     console.log(this.responseText)
+                    // console.log(this.responseText)
                     table.update(this.responseText)
                     // Disable lock
                     switchLock()       
@@ -376,6 +378,8 @@ $table_data = $DB->query($db_request)->fetchAll();
             table.update() // Gen empty table if nothing loaded
             table.buildPlots() // Build plots
         }
+
+        // Set selects options
         set_mmr_methods()
         set_br_test()
     }
@@ -385,7 +389,7 @@ $table_data = $DB->query($db_request)->fetchAll();
         select = document.getElementById('mmr_method')
         var opt
         <?php
-            // Request Species list from DB
+            // Request mmr_methods list from DB
             $stmt = $DB->query("SELECT * FROM mmr_method;");
             while ($row = $stmt->fetch())
             {
@@ -399,11 +403,12 @@ $table_data = $DB->query($db_request)->fetchAll();
 
     }
 
+    // init br_test select options
     function set_br_test() {
         select = document.getElementById('br_test');
         var opt 
         <?php
-            // Request Species list from DB
+            // Request br_test list from DB
             $stmt = $DB->query("SELECT * FROM br_test;");
             while ($row = $stmt->fetch())
             {
@@ -534,15 +539,17 @@ $table_data = $DB->query($db_request)->fetchAll();
                 <tbody>
                     <tr>
                         <td>Select</td>
-                        <?php foreach($table_data as $row): ?>
+<!-- Set table captions -->
+<?php foreach($table_data as $row): ?>
                             <td><?=$row['caption']?></td>
-                        <?php endforeach ?>
+<?php endforeach ?>
                     </tr>
                     <tr>
                         <td class="disabled">Filters:</td>
+                        <!-- datalist for species filter -->
                         <datalist id="species_list">
                             <?php
-                                // Request Species list from DB
+                                // Request species list from DB
                                 $stmt = $DB->query("SELECT name FROM species;");
                                 while ($row = $stmt->fetch())
                                 {
@@ -550,7 +557,7 @@ $table_data = $DB->query($db_request)->fetchAll();
                                 }
                             ?>
                         </datalist>
-                        
+                        <!-- Gen. filters for every column -->
                         <?php
                         $tags = array('%ID%', '%PLACEHOLDER%'); 
                         foreach($table_data as $row) 
@@ -559,10 +566,6 @@ $table_data = $DB->query($db_request)->fetchAll();
                             echo '<td>' . str_replace($tags, $values, $row['html_code']) . '</td>';
                         }
                         ?>
-
-                        <!-- 
-                        <td class="disabled"></td>
-                         -->
                         </form>
                     </tr>
                 </tbody>
