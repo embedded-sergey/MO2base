@@ -582,10 +582,6 @@ $table_data = $DB->query($db_request)->fetchAll();
     <!-- Dynamicaly filled pages counter -->
     <div id="pages_counter"></div>
         
-
-    <!-- Debug buttons -->
-    <button onclick="uploadTestData()">Upload test data</button>
-    <button onclick="switchLock()">Enable hover</button>
     <!-- Hover for loading data -->
     <div id="hover" class="hover">Loading...</div>
 </body>
