@@ -343,7 +343,7 @@ $table_data = $DB->query($db_request)->fetchAll();
             var xhr = new XMLHttpRequest()
             xhr.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
-                    // console.log(this.responseText)
+                    console.log(this.responseText)
                     table.update(this.responseText)
                     // Disable lock
                     switchLock()       
@@ -377,24 +377,43 @@ $table_data = $DB->query($db_request)->fetchAll();
             table.buildPlots() // Build plots
         }
         set_mmr_methods()
+        set_br_test()
     }
 
     // init mmr_methods select options
     function set_mmr_methods() {
-        select = document.getElementById('mmr_method');
+        select = document.getElementById('mmr_method')
+        var opt
         <?php
             // Request Species list from DB
             $stmt = $DB->query("SELECT * FROM mmr_method;");
             while ($row = $stmt->fetch())
             {
                 echo '
-        var opt = document.createElement("option");
+        opt = document.createElement("option")
+        opt.value = "' . $row['name'] . '"
+        opt.innerHTML = "' . $row['name'] . '"
+        select.appendChild(opt)';
+            }
+        ?>
+
+    }
+
+    function set_br_test() {
+        select = document.getElementById('br_test');
+        var opt 
+        <?php
+            // Request Species list from DB
+            $stmt = $DB->query("SELECT * FROM br_test;");
+            while ($row = $stmt->fetch())
+            {
+                echo '
+        opt = document.createElement("option");
         opt.value = "' . $row['name'] . '";
         opt.innerHTML = "' . $row['name'] . '";
         select.appendChild(opt)';
             }
         ?>
-
     }
     
     // function to block the page while loading
@@ -482,7 +501,7 @@ $table_data = $DB->query($db_request)->fetchAll();
             /* TODO: decide on the size */
         }
         /* Disabled cells for unavailable filters */
-        td.disabled {
+        .disabled {
             background-color: gainsboro;
         }
         /* Disable borders for inputs in filters */
