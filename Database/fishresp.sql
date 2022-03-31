@@ -2,10 +2,10 @@
 -- version 5.1.3
 -- https://www.phpmyadmin.net/
 --
--- Хост: 127.0.0.1
--- Время создания: Мар 31 2022 г., 13:10
--- Версия сервера: 10.4.22-MariaDB
--- Версия PHP: 7.4.28
+-- Host: 127.0.0.1
+-- Generation Time: Mar 31, 2022 at 01:24 PM
+-- Server version: 10.4.22-MariaDB
+-- PHP Version: 7.4.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- База данных: `fishresp`
+-- Database: `fishresp`
 --
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `br_test`
+-- Table structure for table `br_test`
 --
 
 CREATE TABLE `br_test` (
@@ -33,7 +33,7 @@ CREATE TABLE `br_test` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Дамп данных таблицы `br_test`
+-- Dumping data for table `br_test`
 --
 
 INSERT INTO `br_test` (`id`, `name`) VALUES
@@ -44,7 +44,7 @@ INSERT INTO `br_test` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `filters`
+-- Table structure for table `filters`
 --
 
 CREATE TABLE `filters` (
@@ -55,7 +55,7 @@ CREATE TABLE `filters` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Дамп данных таблицы `filters`
+-- Dumping data for table `filters`
 --
 
 INSERT INTO `filters` (`id`, `name`, `sql_code`, `html_code`) VALUES
@@ -68,7 +68,7 @@ INSERT INTO `filters` (`id`, `name`, `sql_code`, `html_code`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `js_cellcode`
+-- Table structure for table `js_cellcode`
 --
 
 CREATE TABLE `js_cellcode` (
@@ -77,7 +77,7 @@ CREATE TABLE `js_cellcode` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Дамп данных таблицы `js_cellcode`
+-- Dumping data for table `js_cellcode`
 --
 
 INSERT INTO `js_cellcode` (`id`, `code`) VALUES
@@ -87,7 +87,7 @@ INSERT INTO `js_cellcode` (`id`, `code`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `measurements`
+-- Table structure for table `measurements`
 --
 
 CREATE TABLE `measurements` (
@@ -111,7 +111,7 @@ CREATE TABLE `measurements` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `mmr_method`
+-- Table structure for table `mmr_method`
 --
 
 CREATE TABLE `mmr_method` (
@@ -120,7 +120,7 @@ CREATE TABLE `mmr_method` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Дамп данных таблицы `mmr_method`
+-- Dumping data for table `mmr_method`
 --
 
 INSERT INTO `mmr_method` (`id`, `name`) VALUES
@@ -131,7 +131,7 @@ INSERT INTO `mmr_method` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `publication`
+-- Table structure for table `publication`
 --
 
 CREATE TABLE `publication` (
@@ -142,7 +142,7 @@ CREATE TABLE `publication` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `species`
+-- Table structure for table `species`
 --
 
 CREATE TABLE `species` (
@@ -153,7 +153,7 @@ CREATE TABLE `species` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `table_data`
+-- Table structure for table `table_data`
 --
 
 CREATE TABLE `table_data` (
@@ -166,7 +166,7 @@ CREATE TABLE `table_data` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Дамп данных таблицы `table_data`
+-- Dumping data for table `table_data`
 --
 
 INSERT INTO `table_data` (`id`, `caption`, `json_ident`, `filter_id`, `filter_placeholder`, `js_cellcode_id`) VALUES
@@ -187,29 +187,29 @@ INSERT INTO `table_data` (`id`, `caption`, `json_ident`, `filter_id`, `filter_pl
 (15, 'Comment', 'comment', 0, NULL, 1);
 
 --
--- Индексы сохранённых таблиц
+-- Indexes for dumped tables
 --
 
 --
--- Индексы таблицы `br_test`
+-- Indexes for table `br_test`
 --
 ALTER TABLE `br_test`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `filters`
+-- Indexes for table `filters`
 --
 ALTER TABLE `filters`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `js_cellcode`
+-- Indexes for table `js_cellcode`
 --
 ALTER TABLE `js_cellcode`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `measurements`
+-- Indexes for table `measurements`
 --
 ALTER TABLE `measurements`
   ADD PRIMARY KEY (`id`),
@@ -219,25 +219,25 @@ ALTER TABLE `measurements`
   ADD KEY `measurements_ibfk_5` (`mmr_method_id`);
 
 --
--- Индексы таблицы `mmr_method`
+-- Indexes for table `mmr_method`
 --
 ALTER TABLE `mmr_method`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `publication`
+-- Indexes for table `publication`
 --
 ALTER TABLE `publication`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `species`
+-- Indexes for table `species`
 --
 ALTER TABLE `species`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `table_data`
+-- Indexes for table `table_data`
 --
 ALTER TABLE `table_data`
   ADD PRIMARY KEY (`id`),
@@ -245,63 +245,63 @@ ALTER TABLE `table_data`
   ADD KEY `table_data_ibfk_2` (`js_cellcode_id`);
 
 --
--- AUTO_INCREMENT для сохранённых таблиц
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT для таблицы `br_test`
+-- AUTO_INCREMENT for table `br_test`
 --
 ALTER TABLE `br_test`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT для таблицы `filters`
+-- AUTO_INCREMENT for table `filters`
 --
 ALTER TABLE `filters`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT для таблицы `js_cellcode`
+-- AUTO_INCREMENT for table `js_cellcode`
 --
 ALTER TABLE `js_cellcode`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT для таблицы `measurements`
+-- AUTO_INCREMENT for table `measurements`
 --
 ALTER TABLE `measurements`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT для таблицы `mmr_method`
+-- AUTO_INCREMENT for table `mmr_method`
 --
 ALTER TABLE `mmr_method`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key', AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT для таблицы `publication`
+-- AUTO_INCREMENT for table `publication`
 --
 ALTER TABLE `publication`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key';
 
 --
--- AUTO_INCREMENT для таблицы `species`
+-- AUTO_INCREMENT for table `species`
 --
 ALTER TABLE `species`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Primary key';
 
 --
--- AUTO_INCREMENT для таблицы `table_data`
+-- AUTO_INCREMENT for table `table_data`
 --
 ALTER TABLE `table_data`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- Ограничения внешнего ключа сохраненных таблиц
+-- Constraints for dumped tables
 --
 
 --
--- Ограничения внешнего ключа таблицы `measurements`
+-- Constraints for table `measurements`
 --
 ALTER TABLE `measurements`
   ADD CONSTRAINT `measurements_ibfk_2` FOREIGN KEY (`publication_id`) REFERENCES `publication` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
@@ -310,7 +310,7 @@ ALTER TABLE `measurements`
   ADD CONSTRAINT `measurements_ibfk_5` FOREIGN KEY (`mmr_method_id`) REFERENCES `mmr_method` (`id`) ON UPDATE CASCADE;
 
 --
--- Ограничения внешнего ключа таблицы `table_data`
+-- Constraints for table `table_data`
 --
 ALTER TABLE `table_data`
   ADD CONSTRAINT `table_data_ibfk_1` FOREIGN KEY (`filter_id`) REFERENCES `filters` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
