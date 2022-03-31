@@ -14,16 +14,15 @@ $request_body = file_get_contents('php://input');
 
 $json_data = json_decode($request_body, true);
 
-$db_request = 'SELECT l.id, species.name species, publication.name publication, mmr_method.name mmr_method, 
+$db_request = 'SELECT meas.id, species.name species, publication.name publication, mmr_method.name mmr_method, 
 meas.temperature, meas.salinity, meas.do_level, meas.smr_avg,
 meas.smr_min, meas.smr_max, meas.mmr_avg, meas.mmr_max,
 meas.mass_avg, meas.comment, br_test.name
-FROM links l 
-LEFT JOIN species on species.id = l.species_id 
-LEFT JOIN measurements meas on meas.id = l.measurements_id 
-LEFT JOIN mmr_method on mmr_method.id = l.mmr_method_id 
-LEFT JOIN publication on publication.id = l.publication_id
-LEFT JOIN br_test on br_test.id = l.br_test_id';
+FROM measurements meas 
+LEFT JOIN species on species.id = meas.species_id 
+LEFT JOIN mmr_method on mmr_method.id = meas.mmr_method_id 
+LEFT JOIN publication on publication.id = meas.publication_id
+LEFT JOIN br_test on br_test.id = meas.br_test_id';
 
 $where_flag = 0;
 

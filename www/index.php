@@ -343,7 +343,7 @@ $table_data = $DB->query($db_request)->fetchAll();
             var xhr = new XMLHttpRequest()
             xhr.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
-                    console.log(this.responseText)
+                    // console.log(this.responseText)
                     table.update(this.responseText)
                     // Disable lock
                     switchLock()       
