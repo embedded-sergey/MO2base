@@ -472,62 +472,7 @@ $table_data = $DB->query($db_request)->fetchAll();
     }
     </script>
 
-    <!-- TODO: move in separate file -->
-    <style type="text/css">
-        /* Hover for loading data */
-        .hover {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            background-color: #90909050;
-            visibility: hidden;
-            line-height: 100vh;
-            font-size: larger;
-            text-align: center;
-        }
-
-        /* Select/unselect rows for widgets */
-        .SelectedRow {
-            background-color: yellow;
-        }
-        .UnselectedRow {
-            background-color: #fff;
-        }
-        
-        /* Table parameters */
-        table, th, td {
-            border: 1px solid;
-            height: 1rem;
-            /* max-width: 50rem; */
-            /* TODO: decide on the size */
-        }
-        /* Disabled cells for unavailable filters */
-        .disabled {
-            background-color: gainsboro;
-        }
-        /* Disable borders for inputs in filters */
-        input.Unbordered{
-            border: 0px solid;
-            max-width: 5rem;
-        }
-        
-        /* Divs container */
-        div.container {
-            height: 95vh;
-            display: flex;
-        }
-        div.leftTable {
-            width: 70%;
-            overflow: auto;
-        }
-        div.rightPlots {
-            width: 30%;
-            overflow: auto;
-        }
-    </style>
+    <link rel="stylesheet"href="css/styles.css">
 </head>
 <body onload="init()">
     <div class="container">
