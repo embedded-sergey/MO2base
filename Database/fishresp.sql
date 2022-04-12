@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 31, 2022 at 01:24 PM
+-- Generation Time: Apr 12, 2022 at 11:05 AM
 -- Server version: 10.4.22-MariaDB
 -- PHP Version: 7.4.28
 
@@ -60,10 +60,10 @@ CREATE TABLE `filters` (
 
 INSERT INTO `filters` (`id`, `name`, `sql_code`, `html_code`) VALUES
 (0, 'disabled', 'TRUE', '<div class=\"disabled\">&nbsp;</div>'),
-(1, 'textbox', '%JSON_ID%.name LIKE \"%VALUE%%\" ', '<input class=\"Unbordered\" onchange=\"table.updateFilter(this)\" id=\"%ID%\" placeholder=\"%PLACEHOLDER%\">'),
-(2, 'textbox_listed', '%JSON_ID%.name LIKE \"%VALUE%%\" ', '<input class=\"Unbordered\" onchange=\"table.updateFilter(this)\" id=\"%ID%\" placeholder=\"%PLACEHOLDER%\" list=\"%ID%_list\">'),
+(1, 'textbox', '%JSON_ID%.name LIKE %VALUE%%', '<input class=\"Unbordered\" onchange=\"table.updateFilter(this)\" id=\"%ID%\" placeholder=\"%PLACEHOLDER%\">'),
+(2, 'textbox_listed', '%JSON_ID%.name LIKE %VALUE%%', '<input class=\"Unbordered\" onchange=\"table.updateFilter(this)\" id=\"%ID%\" placeholder=\"%PLACEHOLDER%\" list=\"%ID%_list\">'),
 (3, 'min_max', '', '<input class=\"Unbordered\" onchange=\"table.updateFilter(this)\" id=\"%ID%__min\" placeholder=\"min\">-<input class=\"Unbordered\" onchange=\"table.updateFilter(this)\" id=\"%ID%__max\" placeholder=\"max\">'),
-(4, 'select', '%JSON_ID%.name = \"%VALUE%\"', '<select class=\"Unbordered\" onchange=\"table.updateFilter(this)\" id=\"%ID%\">\r\n</select>');
+(4, 'select', '%JSON_ID%.name = %VALUE%', '<select class=\"Unbordered\" onchange=\"table.updateFilter(this)\" id=\"%ID%\">\r\n</select>');
 
 -- --------------------------------------------------------
 
@@ -101,6 +101,7 @@ CREATE TABLE `measurements` (
   `smr_min` float DEFAULT NULL,
   `smr_max` float DEFAULT NULL,
   `mmr_avg` float DEFAULT NULL,
+  `mmr_min` float DEFAULT NULL,
   `mmr_max` float DEFAULT NULL,
   `mmr_method_id` int(11) NOT NULL DEFAULT 0,
   `mass_avg` float DEFAULT NULL,
