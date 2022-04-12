@@ -18,7 +18,6 @@ $table_data = $DB->query($db_request)->fetchAll();
     <!-- Plot library -->
     <script src='https://cdn.plot.ly/plotly-2.9.0.min.js'></script>
 
-    <!-- TODO: move in separate file -->
     <script>
 
     // Table size
@@ -37,7 +36,7 @@ $table_data = $DB->query($db_request)->fetchAll();
         
         #json = {count: 0, data: []} // private field, contains json data
 
-        #checkedRows = [] // list contain selected rows by json indexes TODO: save between page refresh
+        #checkedRows = [] // list contain selected rows by json indexes 
 
         #pages = {current: 1, count: 1} // dict contain page data
 
@@ -68,6 +67,20 @@ $table_data = $DB->query($db_request)->fetchAll();
             let fishresp_checkedRows = sessionStorage.getItem("fishresp_checkedRows")
             if (fishresp_checkedRows) {
                 this.#checkedRows = JSON.parse('[' + fishresp_checkedRows + ']')
+            }
+        }
+
+        // Restore the contents of filters
+        restore_filters() {
+            let fishresp_filters = sessionStorage.getItem("fishresp_filters")
+            if (fishresp_filters) {
+                this.#filters = JSON.parse(fishresp_filters )
+                // For each key as element id restore values
+                Object.keys(this.#filters).forEach(key  => {
+                    let filter = document.getElementById(key)
+                    if (filter)
+                        filter.value = this.#filters[key]
+                })
             }
         }
 
@@ -347,6 +360,10 @@ $table_data = $DB->query($db_request)->fetchAll();
                 if (this.readyState === 4) {
                     // console.log(this.responseText)
                     table.update(this.responseText)
+                    
+                    // Save filters
+                    sessionStorage.setItem("fishresp_filters", JSON.stringify(table.#filters))
+
                     // Disable lock
                     switchLock()       
                 }
@@ -364,10 +381,15 @@ $table_data = $DB->query($db_request)->fetchAll();
 
     // Function to initialize filters and autosave 
     function init() {
+        // Set selects options
+        set_mmr_methods()
+        set_br_test()
+
         fishresp_json = sessionStorage.getItem("fishresp_json")
         // if has autosave
         if (fishresp_json) {
             table.restore_checkedRows() // Restore the contents of checked rows 
+            table.restore_filters() // Restore the contents of filters
             table.update(fishresp_json) // Restore the contents of json data
             table.buildPlots() // Build plots
         }
@@ -378,9 +400,6 @@ $table_data = $DB->query($db_request)->fetchAll();
             table.buildPlots() // Build plots
         }
 
-        // Set selects options
-        set_mmr_methods()
-        set_br_test()
     }
 
     // init mmr_methods select options
