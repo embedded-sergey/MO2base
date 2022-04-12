@@ -20,7 +20,7 @@ $json_data = json_decode($request_body, true);
 $db_request = 'SELECT meas.id, species.name species, publication.name publication, mmr_method.name mmr_method, 
 meas.temperature, meas.salinity, meas.do_level, meas.smr_avg,
 meas.smr_min, meas.smr_max, meas.mmr_avg, meas.mmr_max,
-meas.mass_avg, meas.comment, br_test.name
+meas.mass_avg, meas.comment, br_test.name 
 FROM measurements meas 
 LEFT JOIN species on species.id = meas.species_id 
 LEFT JOIN mmr_method on mmr_method.id = meas.mmr_method_id 
@@ -29,6 +29,8 @@ LEFT JOIN br_test on br_test.id = meas.br_test_id';
 
 // First time WHERE flag, next times AND
 $where_flag = 0;
+
+$values_array = array();
 
 // For each available filter from DB
 foreach($filter_data as $row)
@@ -43,10 +45,17 @@ foreach($filter_data as $row)
         } 
         else
             $db_request .= ' AND ';
+            
+        if (strrpos($row['sql_code'], '%%', 0) != false)
+        {
+            $row['sql_code'] = str_replace('%%', '%', $row['sql_code']); // remove % from query
+            $json_data[$row['json_ident']] .= '%'; // add % to value
+        }
         // Replace keys by values
         $db_request .= str_replace(array('%JSON_ID%', '%VALUE%'),
-                                   array($row['json_ident'], $json_data[$row['json_ident']]),
+                                   array($row['json_ident'], '?'),  //$json_data[$row['json_ident']]),
                                    $row['sql_code']);
+        $values_array[] = $json_data[$row['json_ident']];
     }
     // if available filter for minimum value in json_data from POST 
     if (array_key_exists($row['json_ident'].'__min', $json_data))
@@ -59,7 +68,8 @@ foreach($filter_data as $row)
         else
             $db_request .= ' AND ';
         // Replace keys by values
-        $db_request .= $json_data[$row['json_ident'] . '__min'] . ' <= meas.' . $row['json_ident'];
+        $db_request .= '? <= meas.' . $row['json_ident'];
+        $values_array[] = $json_data[$row['json_ident'] . '__min'];
     }
     // if available filter for maximum value in json_data from POST
     if (array_key_exists($row['json_ident'].'__max', $json_data))
@@ -72,13 +82,16 @@ foreach($filter_data as $row)
         else
             $db_request .= ' AND ';
         // Replace keys by values
-        $db_request .= 'meas.' . $row['json_ident'] . ' <= ' . $json_data[$row['json_ident'] . '__max'];
+        $db_request .= 'meas.' . $row['json_ident'] . ' <= ?';
+        $values_array[] = $json_data[$row['json_ident'] . '__max'];
     }
 }
 
-// echo $db_request;
+$stmt = $DB->prepare($db_request);
+
+// echo $stmt->queryString; // debug
 // Exec query
-$stmt = $DB->query($db_request);
+$stmt->execute($values_array); //$DB->query($db_request);
 
 // For printing commas after elements in list
 $comma_flag = 0;
